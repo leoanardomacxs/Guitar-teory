@@ -356,6 +356,7 @@ const Index: React.FC = () => {
         darkMode={darkMode} setDarkMode={setDarkMode}
         colorMode={colorMode} setColorMode={setColorMode}
         noteSize={noteSize} setNoteSize={setNoteSize}
+        show24Frets={show24Frets} setShow24Frets={setShow24Frets}
       />
       <main ref={mainRef} className="flex-1 overflow-y-auto p-6 scrollbar-thin">
         {/* Export buttons */}
