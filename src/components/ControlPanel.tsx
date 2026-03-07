@@ -31,6 +31,8 @@ interface ControlPanelProps {
   setColorMode: (c: 'degree' | 'note' | 'function') => void;
   noteSize: number;
   setNoteSize: (n: number) => void;
+  show24Frets: boolean;
+  setShow24Frets: (b: boolean) => void;
 }
 
 const VIEW_MODES: { value: ViewMode; label: string; icon: string }[] = [
