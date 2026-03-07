@@ -28,7 +28,10 @@ const Index: React.FC = () => {
   const [showPentatonic, setShowPentatonic] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [colorMode, setColorMode] = useState<'degree' | 'note' | 'function'>('degree');
-  const [noteSize, setNoteSize] = useState(13);
+  const [noteSize, setNoteSize] = useState(14);
+  const [show24Frets, setShow24Frets] = useState(false);
+
+  const currentMaxFret = show24Frets ? 24 : 12;
 
   const harmonicField = useMemo(() => getHarmonicField(root), [root]);
 
