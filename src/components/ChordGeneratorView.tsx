@@ -65,9 +65,9 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
     [root, selectedType]
   );
 
-  const typeDef = CHORD_TYPES[selectedType];
-  const chordName = `${root}${typeDef?.label || ''}`;
-  const isTriadType = TRIAD_TYPES.includes(selectedType);
+  const typeDef = selectedType === 'all' ? null : CHORD_TYPES[selectedType];
+  const chordName = selectedType === 'all' ? `${root} — Todos` : `${root}${typeDef?.label || ''}`;
+  const isTriadType = selectedType !== 'all' && TRIAD_TYPES.includes(selectedType);
 
   // Compute chord notes and interval names
   const chordFormula = useMemo(() => {
