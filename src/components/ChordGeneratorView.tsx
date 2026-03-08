@@ -179,15 +179,22 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                   </div>
                 </div>
               ))}
+              {/* Show all option */}
+              <div className="border-t border-border pt-2 mt-2">
+                <button
+                  onClick={() => { setSelectedType('all'); setTypeOpen(false); }}
+                  className={`w-full px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
+                    selectedType === 'all'
+                      ? 'bg-primary text-primary-foreground shadow-sm'
+                      : 'text-foreground hover:bg-secondary'
+                  }`}
+                >
+                  🎵 Mostrar todos
+                </button>
+              </div>
             </div>
           )}
         </div>
-
-        {/* Chord formula toggle */}
-        {chordFormula.notes.length > 0 && (
-          <button
-            onClick={() => setShowNotes(!showNotes)}
-            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all cursor-pointer ${
               showNotes
                 ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
                 : 'border-border bg-card hover:bg-secondary/60'
