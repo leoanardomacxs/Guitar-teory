@@ -9,7 +9,7 @@ let dryGain: GainNode | null = null;
 let masterGainNode: GainNode | null = null;
 
 // ─── Global Settings ───
-export type TimbreType = 'guitar' | 'nylon' | 'bass' | 'piano' | 'electric' | 'synth' | 'organ' | 'bell';
+export type TimbreType = 'guitar' | 'nylon' | 'bass' | 'piano' | 'electric' | 'synth' | 'organ' | 'bell' | 'harpsichord' | 'strings' | 'flute' | 'harmonica' | 'musicbox' | 'sitar' | 'marimba' | 'brass';
 
 export interface AudioSettings {
   volume: number;       // 0–1
@@ -17,7 +17,13 @@ export interface AudioSettings {
   timbre: TimbreType;
   reverb: number;       // 0–1
   delay: number;        // 0–1
+  delayTime: number;    // 0.05–1.0 seconds
+  delayFeedback: number;// 0–0.9
   brightness: number;   // 0–1
+  distortion: number;   // 0–1
+  vibrato: number;      // 0–1
+  vibratoSpeed: number; // 1–12 Hz
+  octave: number;       // -2 to +2
 }
 
 const defaultSettings: AudioSettings = {
@@ -26,7 +32,13 @@ const defaultSettings: AudioSettings = {
   timbre: 'guitar',
   reverb: 0.2,
   delay: 0,
+  delayTime: 0.3,
+  delayFeedback: 0.3,
   brightness: 0.5,
+  distortion: 0,
+  vibrato: 0,
+  vibratoSpeed: 5,
+  octave: 0,
 };
 
 let settings: AudioSettings = { ...defaultSettings };
@@ -66,7 +78,15 @@ export const TIMBRE_LIST: { key: TimbreType; label: string; icon: string }[] = [
   { key: 'electric', label: 'Guitarra Elétrica', icon: '' },
   { key: 'synth', label: 'Sintetizador', icon: '' },
   { key: 'organ', label: 'Órgão', icon: '' },
-  { key: 'bell', label: 'Sino / Bell', icon: '' },
+  { key: 'bell', label: 'Sino', icon: '' },
+  { key: 'harpsichord', label: 'Cravo', icon: '' },
+  { key: 'strings', label: 'Cordas', icon: '' },
+  { key: 'flute', label: 'Flauta', icon: '' },
+  { key: 'harmonica', label: 'Gaita', icon: '' },
+  { key: 'musicbox', label: 'Caixinha de Música', icon: '' },
+  { key: 'sitar', label: 'Sitar', icon: '' },
+  { key: 'marimba', label: 'Marimba', icon: '' },
+  { key: 'brass', label: 'Metais', icon: '' },
 ];
 
 interface TimbreDef {
@@ -153,6 +173,78 @@ function getTimbreDef(timbre: TimbreType, brightness: number): TimbreDef {
         attackTime: 0.001,
         sustainLevel: 0.001,
       };
+    case 'harpsichord':
+      return {
+        oscTypes: ['sawtooth', 'square', 'sine', 'sine'],
+        harmonicGains: [0.3, 0.25 * br, 0.15 * br, 0.08 * br],
+        harmonicMultipliers: [1, 2, 3, 5],
+        decayMultipliers: [0.6, 0.4, 0.3, 0.2],
+        attackTime: 0.001,
+        sustainLevel: 0.001,
+      };
+    case 'strings':
+      return {
+        oscTypes: ['sawtooth', 'sawtooth', 'sine', 'sine'],
+        harmonicGains: [0.25, 0.22, 0.15 * br, 0.08 * br],
+        harmonicMultipliers: [1, 1.002, 2, 3],
+        decayMultipliers: [3, 3, 2, 1.5],
+        attackTime: 0.08,
+        sustainLevel: 0.15,
+      };
+    case 'flute':
+      return {
+        oscTypes: ['sine', 'sine', 'sine'],
+        harmonicGains: [0.6, 0.08 * br, 0.03 * br],
+        harmonicMultipliers: [1, 2, 3],
+        decayMultipliers: [2, 1.5, 1],
+        attackTime: 0.04,
+        sustainLevel: 0.1,
+      };
+    case 'harmonica':
+      return {
+        oscTypes: ['square', 'sawtooth', 'sine', 'sine'],
+        harmonicGains: [0.3, 0.15, 0.12 * br, 0.06 * br],
+        harmonicMultipliers: [1, 1.003, 2, 3],
+        decayMultipliers: [2.5, 2.5, 1.5, 1],
+        attackTime: 0.015,
+        sustainLevel: 0.08,
+      };
+    case 'musicbox':
+      return {
+        oscTypes: ['sine', 'sine', 'sine'],
+        harmonicGains: [0.5, 0.35 * br, 0.2 * br],
+        harmonicMultipliers: [1, 3, 5],
+        decayMultipliers: [1.5, 0.8, 0.4],
+        attackTime: 0.001,
+        sustainLevel: 0.001,
+      };
+    case 'sitar':
+      return {
+        oscTypes: ['sawtooth', 'sine', 'sine', 'sine'],
+        harmonicGains: [0.35, 0.2 * br, 0.15 * br, 0.1 * br],
+        harmonicMultipliers: [1, 1.01, 2, 4.5],
+        decayMultipliers: [2, 1.8, 1, 0.5],
+        attackTime: 0.002,
+        sustainLevel: 0.01,
+      };
+    case 'marimba':
+      return {
+        oscTypes: ['sine', 'sine', 'sine'],
+        harmonicGains: [0.6, 0.2 * br, 0.1 * br],
+        harmonicMultipliers: [1, 4, 10],
+        decayMultipliers: [0.8, 0.4, 0.2],
+        attackTime: 0.001,
+        sustainLevel: 0.001,
+      };
+    case 'brass':
+      return {
+        oscTypes: ['sawtooth', 'square', 'sine', 'sine'],
+        harmonicGains: [0.35, 0.2, 0.15 * br, 0.1 * br],
+        harmonicMultipliers: [1, 2, 3, 4],
+        decayMultipliers: [2.5, 2, 1.5, 1],
+        attackTime: 0.03,
+        sustainLevel: 0.1,
+      };
   }
 }
 
@@ -226,13 +318,29 @@ export function noteNameToMidi(name: string, octave = 4): number {
   return 12 * (octave + 1) + semi;
 }
 
+// ─── Distortion ───
+function createDistortion(ctx: AudioContext, amount: number): WaveShaperNode {
+  const shaper = ctx.createWaveShaper();
+  const k = amount * 400;
+  const samples = 44100;
+  const curve = new Float32Array(samples);
+  for (let i = 0; i < samples; i++) {
+    const x = (i * 2) / samples - 1;
+    curve[i] = ((3 + k) * x * 20 * (Math.PI / 180)) / (Math.PI + k * Math.abs(x));
+  }
+  shaper.curve = curve;
+  shaper.oversample = '4x';
+  return shaper;
+}
+
 // ─── Play Functions ───
 
 export function playNote(midi: number, duration = 0.8, volume = 0.3, startTime?: number): void {
   if (settings.muted) return;
   const ctx = getAudioContext();
   const t = startTime ?? ctx.currentTime;
-  const freq = midiToFreq(midi);
+  const adjustedMidi = midi + (settings.octave * 12);
+  const freq = midiToFreq(adjustedMidi);
   const timbreDef = getTimbreDef(settings.timbre, settings.brightness);
   const vol = volume * settings.volume;
 
@@ -242,10 +350,36 @@ export function playNote(midi: number, duration = 0.8, volume = 0.3, startTime?:
   noteGain.gain.linearRampToValueAtTime(vol, t + timbreDef.attackTime);
   noteGain.gain.exponentialRampToValueAtTime(Math.max(timbreDef.sustainLevel * vol, 0.0001), t + duration);
   
+  // Build effect chain: noteGain → [distortion] → output
+  let outputChain: AudioNode = noteGain;
+
+  // Distortion
+  if (settings.distortion > 0.01) {
+    const dist = createDistortion(ctx, settings.distortion);
+    noteGain.connect(dist);
+    outputChain = dist;
+  }
+
   // Connect to dry + reverb
-  noteGain.connect(getOutputNode());
+  outputChain.connect(getOutputNode());
   if (settings.reverb > 0.01) {
-    noteGain.connect(getReverbInput());
+    outputChain.connect(getReverbInput());
+  }
+
+  // Delay effect
+  if (settings.delay > 0.01) {
+    const delayNode = ctx.createDelay(2.0);
+    delayNode.delayTime.setValueAtTime(settings.delayTime, t);
+    const feedbackGain = ctx.createGain();
+    feedbackGain.gain.setValueAtTime(settings.delayFeedback, t);
+    const delayVol = ctx.createGain();
+    delayVol.gain.setValueAtTime(settings.delay * 0.6, t);
+    
+    outputChain.connect(delayNode);
+    delayNode.connect(feedbackGain);
+    feedbackGain.connect(delayNode);
+    delayNode.connect(delayVol);
+    delayVol.connect(getOutputNode());
   }
 
   // Create oscillators based on timbre
@@ -253,7 +387,21 @@ export function playNote(midi: number, duration = 0.8, volume = 0.3, startTime?:
   for (let i = 0; i < oscCount; i++) {
     const osc = ctx.createOscillator();
     osc.type = timbreDef.oscTypes[i];
-    osc.frequency.setValueAtTime(freq * timbreDef.harmonicMultipliers[i], t);
+    const baseFreq = freq * timbreDef.harmonicMultipliers[i];
+    osc.frequency.setValueAtTime(baseFreq, t);
+
+    // Vibrato
+    if (settings.vibrato > 0.01) {
+      const lfo = ctx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.setValueAtTime(settings.vibratoSpeed, t);
+      const lfoGain = ctx.createGain();
+      lfoGain.gain.setValueAtTime(baseFreq * settings.vibrato * 0.02, t);
+      lfo.connect(lfoGain);
+      lfoGain.connect(osc.frequency);
+      lfo.start(t);
+      lfo.stop(t + duration + 0.5);
+    }
 
     const g = ctx.createGain();
     const harmGain = timbreDef.harmonicGains[i];
