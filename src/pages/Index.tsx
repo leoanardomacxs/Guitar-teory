@@ -37,6 +37,7 @@ const Index: React.FC = () => {
   const currentMaxFret = show24Frets ? 24 : 12;
 
   const harmonicField = useMemo(() => getHarmonicField(root), [root]);
+  const scaleHarmonicField = useMemo(() => getHarmonicFieldForScale(root, scaleType), [root, scaleType]);
 
   // Auto-select first chord when switching to chord mode
   useEffect(() => {
