@@ -64,6 +64,7 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
   const [history, setHistory] = useState<Array<{ degrees: number[]; chords: ChordInfo[] }>>([]);
   // all12 mode: generate in random key
   const [displayMode, setDisplayMode] = useState<'full' | 'degrees' | 'hidden'>('full');
+  const [showHarmonicField, setShowHarmonicField] = useState(true);
   const [allKeys, setAllKeys] = useState(false);
 
   const generateNew = useCallback(() => {
@@ -150,19 +151,29 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
 
       {/* Harmonic field overview */}
       <div className="bg-card border border-border rounded-lg p-4">
-        <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2 font-bold">Campo Harmônico de {root}</p>
-        <div className="flex flex-wrap gap-2">
-          {harmonicField.map((ch, i) => (
-            <div
-              key={ch.name}
-              className={`flex flex-col items-center px-3 py-2 rounded-lg border transition-all ${degreeColors[i + 1]}`}
-            >
-              <span className="text-[10px] text-muted-foreground font-mono">{ch.romanNumeral}</span>
-              <span className="text-sm font-bold text-foreground">{ch.name}</span>
-              <span className="text-[9px] text-muted-foreground">{ch.notes.join(' ')}</span>
-            </div>
-          ))}
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Campo Harmônico de {root}</p>
+          <button
+            onClick={() => setShowHarmonicField(!showHarmonicField)}
+            className="text-[10px] font-semibold px-2 py-0.5 rounded transition-all bg-secondary text-muted-foreground hover:text-foreground"
+          >
+            {showHarmonicField ? 'Ocultar' : 'Exibir'}
+          </button>
         </div>
+        {showHarmonicField && (
+          <div className="flex flex-wrap gap-2 note-appear">
+            {harmonicField.map((ch, i) => (
+              <div
+                key={ch.name}
+                className={`flex flex-col items-center px-3 py-2 rounded-lg border transition-all ${degreeColors[i + 1]}`}
+              >
+                <span className="text-[10px] text-muted-foreground font-mono">{ch.romanNumeral}</span>
+                <span className="text-sm font-bold text-foreground">{ch.name}</span>
+                <span className="text-[9px] text-muted-foreground">{ch.notes.join(' ')}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Controls */}
