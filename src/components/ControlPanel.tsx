@@ -46,7 +46,53 @@ interface ControlPanelProps {
   setShow24Frets: (b: boolean) => void;
 }
 
-const VIEW_MODES: { value: ViewMode; label: string; icon: string }[] = [
+// Color variant palettes — each mode has multiple palettes that cycle on re-click
+const DEGREE_PALETTES: string[][] = [
+  // 0: Default (warm/cool mix)
+  ['0 75% 55%', '210 75% 55%', '145 65% 42%', '220 12% 55%', '28 90% 55%', '270 60% 55%', '220 20% 25%'],
+  // 1: Rainbow (espectro cromático)
+  ['0 80% 50%', '30 90% 50%', '60 80% 45%', '120 65% 40%', '200 80% 50%', '260 70% 55%', '310 70% 50%'],
+  // 2: Ocean (tons frios)
+  ['190 80% 40%', '210 85% 50%', '230 75% 55%', '170 60% 42%', '250 65% 55%', '280 50% 50%', '200 30% 35%'],
+  // 3: Sunset (tons quentes)
+  ['0 85% 55%', '15 90% 52%', '35 95% 50%', '50 85% 48%', '350 75% 50%', '320 60% 50%', '280 45% 40%'],
+  // 4: Neon (vibrante)
+  ['340 100% 60%', '180 100% 45%', '60 100% 50%', '120 100% 40%', '280 100% 60%', '30 100% 55%', '200 100% 55%'],
+  // 5: Pastel (suave)
+  ['0 55% 70%', '210 55% 70%', '145 45% 60%', '40 50% 65%', '270 45% 70%', '170 45% 60%', '300 40% 68%'],
+];
+
+const NOTE_PALETTES: Record<string, string>[] = [
+  // 0: Default vivid
+  { C:'#e74c3c', 'C#':'#e67e22', Db:'#e67e22', D:'#f1c40f', 'D#':'#2ecc71', Eb:'#2ecc71', E:'#1abc9c', F:'#3498db', 'F#':'#9b59b6', Gb:'#9b59b6', G:'#e91e63', 'G#':'#ff5722', Ab:'#ff5722', A:'#00bcd4', 'A#':'#8bc34a', Bb:'#8bc34a', B:'#795548' },
+  // 1: Chromatic rainbow (evenly spaced hue)
+  { C:'hsl(0,75%,50%)', 'C#':'hsl(30,75%,50%)', Db:'hsl(30,75%,50%)', D:'hsl(60,75%,45%)', 'D#':'hsl(90,70%,40%)', Eb:'hsl(90,70%,40%)', E:'hsl(120,65%,40%)', F:'hsl(150,70%,42%)', 'F#':'hsl(180,70%,42%)', Gb:'hsl(180,70%,42%)', G:'hsl(210,75%,50%)', 'G#':'hsl(240,65%,55%)', Ab:'hsl(240,65%,55%)', A:'hsl(270,65%,50%)', 'A#':'hsl(300,65%,50%)', Bb:'hsl(300,65%,50%)', B:'hsl(330,70%,50%)' },
+  // 2: Pastel chromatic
+  { C:'hsl(0,50%,70%)', 'C#':'hsl(30,50%,68%)', Db:'hsl(30,50%,68%)', D:'hsl(60,50%,62%)', 'D#':'hsl(90,45%,58%)', Eb:'hsl(90,45%,58%)', E:'hsl(120,45%,55%)', F:'hsl(150,50%,58%)', 'F#':'hsl(180,50%,55%)', Gb:'hsl(180,50%,55%)', G:'hsl(210,55%,65%)', 'G#':'hsl(240,45%,65%)', Ab:'hsl(240,45%,65%)', A:'hsl(270,45%,62%)', 'A#':'hsl(300,45%,62%)', Bb:'hsl(300,45%,62%)', B:'hsl(330,50%,65%)' },
+  // 3: Earth tones
+  { C:'hsl(5,60%,45%)', 'C#':'hsl(20,55%,42%)', Db:'hsl(20,55%,42%)', D:'hsl(35,65%,45%)', 'D#':'hsl(50,55%,40%)', Eb:'hsl(50,55%,40%)', E:'hsl(80,40%,38%)', F:'hsl(140,35%,40%)', 'F#':'hsl(170,40%,38%)', Gb:'hsl(170,40%,38%)', G:'hsl(200,45%,42%)', 'G#':'hsl(220,40%,45%)', Ab:'hsl(220,40%,45%)', A:'hsl(250,35%,45%)', 'A#':'hsl(280,30%,42%)', Bb:'hsl(280,30%,42%)', B:'hsl(320,35%,40%)' },
+];
+
+const FUNCTION_PALETTES: { root: string; chord: string; default: string }[] = [
+  // 0: Default
+  { root: 'hsl(280, 40%, 35%)', chord: 'hsl(145, 65%, 42%)', default: 'hsl(210, 55%, 42%)' },
+  // 1: Warm
+  { root: 'hsl(0, 70%, 45%)', chord: 'hsl(35, 85%, 48%)', default: 'hsl(50, 50%, 42%)' },
+  // 2: Cool
+  { root: 'hsl(200, 80%, 40%)', chord: 'hsl(260, 60%, 50%)', default: 'hsl(180, 45%, 40%)' },
+  // 3: High contrast
+  { root: 'hsl(0, 90%, 50%)', chord: 'hsl(120, 80%, 35%)', default: 'hsl(220, 70%, 50%)' },
+];
+
+const COLOR_VARIANT_COUNTS: Record<string, number> = {
+  degree: DEGREE_PALETTES.length,
+  note: NOTE_PALETTES.length,
+  function: FUNCTION_PALETTES.length,
+};
+
+export { DEGREE_PALETTES, NOTE_PALETTES, FUNCTION_PALETTES };
+
+
   { value: 'full', label: 'Escala Completa', icon: '' },
   { value: 'intervals', label: 'Intervalos', icon: '' },
   { value: 'notes', label: 'Notas', icon: '' },
