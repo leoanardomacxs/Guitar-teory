@@ -543,8 +543,15 @@ const HarmonicFieldView: React.FC<HarmonicFieldViewProps> = ({ root, setRoot }) 
                       <span className="text-sm font-bold text-foreground">ii-V-I → {ch.romanNumeral} ({ch.name})</span>
                       <button
                         onClick={async () => {
-                          for (const c of iiVI) {
-                            playChordNotes(c.notes, ch.root, c.root);
+                          let curBase = noteNameToMidi(iiVI[0].root, 3);
+                          for (let ci = 0; ci < iiVI.length; ci++) {
+                            if (ci > 0) {
+                              const s = noteNameToMidi(iiVI[ci].root, 0) % 12;
+                              let nx = curBase - (curBase % 12) + s;
+                              while (nx <= curBase) nx += 12;
+                              curBase = nx;
+                            }
+                            playChordWithBass(iiVI[ci].notes, curBase);
                             await new Promise(r => setTimeout(r, 1200));
                           }
                         }}
