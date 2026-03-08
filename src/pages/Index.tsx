@@ -155,6 +155,7 @@ const Index: React.FC = () => {
                 colorMode={colorMode}
                 colorVariant={colorVariant}
                 noteRadius={noteSize}
+              />
             </div>
           </div>
         );
