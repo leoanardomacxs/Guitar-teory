@@ -6,6 +6,7 @@ import ProgressionGeneratorView from '@/components/ProgressionGeneratorView';
 import {
   getScale,
   getHarmonicField,
+  getHarmonicFieldForScale,
   getFretboardNotes,
   filterByScale,
   filterByNotes,
@@ -36,6 +37,7 @@ const Index: React.FC = () => {
   const currentMaxFret = show24Frets ? 24 : 12;
 
   const harmonicField = useMemo(() => getHarmonicField(root), [root]);
+  const scaleHarmonicField = useMemo(() => getHarmonicFieldForScale(root, scaleType), [root, scaleType]);
 
   // Auto-select first chord when switching to chord mode
   useEffect(() => {
@@ -209,22 +211,35 @@ const Index: React.FC = () => {
 
   const renderHarmonicFieldView = () => {
     const isPentatonic = scaleType === 'Pentatônica Maior' || scaleType === 'Pentatônica Menor';
-    
+    const isMinorFamily = ['Menor Natural', 'Menor Harmônica', 'Menor Melódica', 'Pentatônica Menor', 'Eólio', 'Dórico', 'Frígio', 'Lócrio'].includes(scaleType);
+    const field = scaleHarmonicField;
+
+    const getScaleLabel = () => {
+      if (isPentatonic) return `Pentatônicas do Campo Harmônico de ${root}`;
+      if (isMinorFamily) return `Campo Harmônico de ${root} (${scaleType})`;
+      return `Campo Harmônico de ${root}`;
+    };
+
     return (
       <div className="space-y-6">
         <ViewHeader 
-          title={isPentatonic ? `Pentatônicas do Campo Harmônico de ${root}` : `Campo Harmônico de ${root}`} 
+          title={getScaleLabel()} 
           subtitle={isPentatonic ? "Pentatônicas de cada grau da tonalidade" : "Todos os graus com diagramas individuais"} 
         />
-        {harmonicField.map(ch => {
+        {field.map(ch => {
           let scType: string;
           if (isPentatonic) {
             scType = (ch.quality === 'minor' || ch.quality === 'diminished') ? 'Pentatônica Menor' : 'Pentatônica Maior';
           } else {
-            scType = ch.quality === 'Major' ? 'Maior' : ch.quality === 'minor' ? 'Menor Natural' : 'Lócrio';
+            // Use the scale that matches the chord quality from the harmonic field
+            if (ch.quality === 'Major') scType = 'Maior';
+            else if (ch.quality === 'minor') scType = 'Menor Natural';
+            else if (ch.quality === 'diminished') scType = 'Lócrio';
+            else if (ch.quality === 'augmented') scType = 'Maior';
+            else scType = 'Maior';
           }
           const notes = filterByScale(allFretNotes, ch.root, scType);
-          const scaleLabel = isPentatonic ? scType : (ch.quality === 'Major' ? 'Maior' : ch.quality === 'minor' ? 'Menor Natural' : 'Lócrio');
+          const displayLabel = isPentatonic ? scType : `${ch.name} (${ch.quality})`;
           return (
             <div key={ch.name} className="overflow-x-auto pb-2">
               <GuitarFretboard
@@ -234,7 +249,7 @@ const Index: React.FC = () => {
                 showDegrees={true}
                 colorMode={colorMode}
                 noteRadius={noteSize * 0.9}
-                title={`${ch.romanNumeral} — ${ch.root} ${scaleLabel}`}
+                title={`${ch.romanNumeral} — ${isPentatonic ? `${ch.root} ${scType}` : ch.name}`}
                 subtitle={`Notas: ${getScale(ch.root, scType).join(' – ')}`}
               />
             </div>

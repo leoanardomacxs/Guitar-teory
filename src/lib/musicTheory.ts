@@ -108,36 +108,66 @@ export interface ChordInfo {
 }
 
 export function getHarmonicField(root: string): ChordInfo[] {
-  const scale = getScale(root, 'Maior');
+  return getHarmonicFieldForScale(root, 'Maior');
+}
+
+export function getHarmonicFieldForScale(root: string, scaleType: string): ChordInfo[] {
+  const formula = SCALE_FORMULAS[scaleType];
+  if (!formula || formula.length < 7) {
+    // For pentatonic/blues (less than 7 notes), fall back to parent scale
+    if (scaleType === 'Pentatônica Menor' || scaleType === 'Eólio') return getHarmonicFieldForScale(root, 'Menor Natural');
+    if (scaleType === 'Pentatônica Maior' || scaleType === 'Jônio') return getHarmonicFieldForScale(root, 'Maior');
+    if (scaleType === 'Blues') return getHarmonicFieldForScale(root, 'Menor Natural');
+    if (scaleType === 'Dórico') return getHarmonicFieldForScale(root, 'Menor Natural');
+    if (scaleType === 'Frígio') return getHarmonicFieldForScale(root, 'Menor Natural');
+    if (scaleType === 'Lídio') return getHarmonicFieldForScale(root, 'Maior');
+    if (scaleType === 'Mixolídio') return getHarmonicFieldForScale(root, 'Maior');
+    if (scaleType === 'Lócrio') return getHarmonicFieldForScale(root, 'Menor Natural');
+    return getHarmonicFieldForScale(root, 'Maior');
+  }
+
+  const rootIdx = getNoteIndex(root);
   const flats = useFlats(root);
-  
-  return scale.map((note, i) => {
-    const rootIdx = getNoteIndex(note);
-    let thirdInterval: number, fifthInterval: number;
-    
-    if (CHORD_QUALITIES[i] === 'Major') {
-      thirdInterval = 4; fifthInterval = 7;
-    } else if (CHORD_QUALITIES[i] === 'minor') {
-      thirdInterval = 3; fifthInterval = 7;
+
+  return formula.map((interval, i) => {
+    const noteIdx = (rootIdx + interval) % 12;
+    const note = getNoteName(noteIdx, flats);
+
+    // Build triad by stacking thirds from the scale
+    const thirdInterval = formula[(i + 2) % 7] - formula[i];
+    const fifthInterval = formula[(i + 4) % 7] - formula[i];
+    const third = ((thirdInterval % 12) + 12) % 12;
+    const fifth = ((fifthInterval % 12) + 12) % 12;
+
+    let quality: string;
+    let suffix: string;
+    let romanBase: string;
+
+    if (third === 4 && fifth === 7) {
+      quality = 'Major'; suffix = ''; romanBase = ['I','II','III','IV','V','VI','VII'][i];
+    } else if (third === 3 && fifth === 7) {
+      quality = 'minor'; suffix = 'm'; romanBase = ['i','ii','iii','iv','v','vi','vii'][i];
+    } else if (third === 3 && fifth === 6) {
+      quality = 'diminished'; suffix = '°'; romanBase = ['i°','ii°','iii°','iv°','v°','vi°','vii°'][i];
+    } else if (third === 4 && fifth === 8) {
+      quality = 'augmented'; suffix = '+'; romanBase = ['I+','II+','III+','IV+','V+','VI+','VII+'][i];
     } else {
-      thirdInterval = 3; fifthInterval = 6;
+      quality = 'Major'; suffix = ''; romanBase = ['I','II','III','IV','V','VI','VII'][i];
     }
-    
-    const notes = [
+
+    const chordNotes = [
       note,
-      getNoteName(rootIdx + thirdInterval, flats),
-      getNoteName(rootIdx + fifthInterval, flats),
+      getNoteName(noteIdx + third, flats),
+      getNoteName(noteIdx + fifth, flats),
     ];
-    
-    const suffix = CHORD_QUALITIES[i] === 'minor' ? 'm' : CHORD_QUALITIES[i] === 'diminished' ? '°' : '';
-    
+
     return {
       name: `${note}${suffix}`,
       root: note,
-      quality: CHORD_QUALITIES[i],
-      notes,
+      quality,
+      notes: chordNotes,
       degree: i + 1,
-      romanNumeral: DEGREE_LABELS[i],
+      romanNumeral: romanBase,
     };
   });
 }
