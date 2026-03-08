@@ -1,11 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ALL_ROOTS,
   SCALE_CATEGORIES,
   SCALE_FORMULAS,
   type ChordInfo,
 } from '@/lib/musicTheory';
-import { playClick, playScale, getScaleMidiNotes } from '@/lib/audioEngine';
+import {
+  playClick, playScale, getScaleMidiNotes,
+  getAudioSettings, updateAudioSettings, subscribeAudioSettings,
+  TIMBRE_LIST,
+  type AudioSettings, type TimbreType,
+} from '@/lib/audioEngine';
 
 export type ViewMode = 
   | 'full' | 'position' | 'caged' | 'intervals' | 'notes' 
