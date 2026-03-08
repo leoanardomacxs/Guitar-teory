@@ -190,6 +190,7 @@ const Index: React.FC = () => {
             noteRadius={noteSize}
             title={`Acorde ${selectedChord.name}`}
             subtitle={`Notas: ${selectedChord.notes.join(' ')}`}
+          />
         </div>
         {showArpeggio && (
           <div className="overflow-x-auto pb-2">
@@ -366,6 +367,7 @@ const Index: React.FC = () => {
             noteRadius={noteSize}
             title={`Notas Alvo — ${selectedChord.name}`}
             subtitle="Chord tones"
+          />
         </div>
         <div className="overflow-x-auto pb-2">
           <GuitarFretboard
