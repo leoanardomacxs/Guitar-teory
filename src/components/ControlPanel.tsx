@@ -512,7 +512,7 @@ function AudioSettingsPanel() {
   );
 }
 
-function Section({ title, children, collapsible = false, defaultOpen = true }: { title: string; children: React.ReactNode; collapsible?: boolean; defaultOpen?: boolean }) {
+function Section({ title, hint, children, collapsible = false, defaultOpen = true }: { title: string; hint?: string; children: React.ReactNode; collapsible?: boolean; defaultOpen?: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
 
   return (
@@ -520,7 +520,7 @@ function Section({ title, children, collapsible = false, defaultOpen = true }: {
       {collapsible ? (
         <button
           onClick={() => setOpen(!open)}
-          className={`w-full flex items-center justify-between text-[11px] uppercase tracking-wider mb-2 font-bold transition-colors duration-200 rounded px-2 py-1.5 ${
+          className={`w-full flex items-center justify-between text-[11px] uppercase tracking-wider mb-1 font-bold transition-colors duration-200 rounded px-2 py-1.5 ${
             open
               ? 'text-primary bg-primary/10'
               : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
@@ -535,7 +535,10 @@ function Section({ title, children, collapsible = false, defaultOpen = true }: {
           </svg>
         </button>
       ) : (
-        <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2 font-bold">{title}</h3>
+        <h3 className="text-[11px] uppercase tracking-wider text-muted-foreground mb-1 font-bold">{title}</h3>
+      )}
+      {hint && (!collapsible || open) && (
+        <p className="text-[9px] text-muted-foreground/70 mb-2 px-1 leading-relaxed italic">{hint}</p>
       )}
       {collapsible ? (
         <div
