@@ -52,20 +52,23 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
   const chordName = `${root}${typeDef?.label || ''}`;
   const isTriadType = TRIAD_TYPES.includes(selectedType);
 
+  // Group triads by inversion type, sorted by fret position (closest to nut first)
   const groupedTriads = useMemo(() => {
     if (!isTriadType || triadInversions.length === 0) return [];
-    const byStringSet = new Map<string, TriadVoicing[]>();
-    for (const t of triadInversions) {
-      if (!byStringSet.has(t.stringSet)) byStringSet.set(t.stringSet, []);
-      byStringSet.get(t.stringSet)!.push(t);
+    const invOrder = ['Fundamental', '1ª Inversão', '2ª Inversão'];
+    const byInversion = new Map<string, TriadVoicing[]>();
+    for (const inv of invOrder) {
+      byInversion.set(inv, []);
     }
-    return Array.from(byStringSet.entries()).map(([stringSet, voicings]) => ({
-      stringSet,
-      voicings: voicings.sort((a, b) => {
-        const invOrder = ['Fundamental', '1ª Inversão', '2ª Inversão'];
-        return invOrder.indexOf(a.inversion) - invOrder.indexOf(b.inversion) || a.score - b.score;
-      }),
-    }));
+    for (const t of triadInversions) {
+      byInversion.get(t.inversion)?.push(t);
+    }
+    return Array.from(byInversion.entries())
+      .filter(([, voicings]) => voicings.length > 0)
+      .map(([inversion, voicings]) => ({
+        inversion,
+        voicings: voicings.sort((a, b) => a.startFret - b.startFret),
+      }));
   }, [triadInversions, isTriadType]);
 
   const stringSetLabels: Record<string, string> = {
@@ -211,29 +214,46 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
       {isTriadType && groupedTriads.length > 0 && (
         <div className="space-y-6 pt-6 border-t border-border">
           <div>
-            <h3 className="text-lg font-bold text-foreground">Tríades — Inversões CAGED</h3>
+            <h3 className="text-lg font-bold text-foreground">Tríades — Inversões</h3>
             <p className="text-sm text-muted-foreground mt-0.5">
-              Todas as inversões de {chordName} organizadas por grupo de cordas
+              Inversões de {chordName} ordenadas da mais próxima ao início do braço até a mais distante
             </p>
+            <div className="flex items-center gap-4 mt-2 text-[10px] text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-sm bg-blue-500/30 border border-blue-500/50" /> Fundamental (Tônica no baixo)
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-sm bg-purple-500/30 border border-purple-500/50" /> 1ª Inversão (Terça no baixo)
+              </span>
+              <span className="inline-flex items-center gap-1">
+                <span className="w-2.5 h-2.5 rounded-sm bg-amber-500/30 border border-amber-500/50" /> 2ª Inversão (Quinta no baixo)
+              </span>
+            </div>
           </div>
 
-          {groupedTriads.map(({ stringSet, voicings: triadVoicings }) => (
-            <div key={stringSet} className="space-y-3">
-              <div className="flex items-center gap-2">
-                <h4 className="text-sm font-semibold text-foreground">
-                  {stringSetLabels[stringSet] || stringSet}
-                </h4>
-                <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
-                  {triadVoicings.length} formas
-                </span>
-              </div>
+          {groupedTriads.map(({ inversion, voicings: triadVoicings }) => {
+            const invColor = inversion === 'Fundamental' ? 'border-blue-500/40 bg-blue-500/5' :
+              inversion === '1ª Inversão' ? 'border-purple-500/40 bg-purple-500/5' :
+              'border-amber-500/40 bg-amber-500/5';
+            const invDesc = inversion === 'Fundamental' ? 'Tônica é a nota mais grave' :
+              inversion === '1ª Inversão' ? 'Terça é a nota mais grave' :
+              'Quinta é a nota mais grave';
+            return (
+              <div key={inversion} className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <h4 className="text-sm font-semibold text-foreground">
+                    {inversion}
+                  </h4>
+                  <span className="text-[10px] text-muted-foreground">
+                    — {invDesc}
+                  </span>
+                  <span className="text-[10px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full ml-auto">
+                    {triadVoicings.length} formas
+                  </span>
+                </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
-                {triadVoicings.map((v, i) => {
-                  const invColor = v.inversion === 'Fundamental' ? 'border-blue-500/40 bg-blue-500/5' :
-                    v.inversion === '1ª Inversão' ? 'border-purple-500/40 bg-purple-500/5' :
-                    'border-amber-500/40 bg-amber-500/5';
-                  return (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+                  {triadVoicings.map((v, i) => (
                     <div
                       key={i}
                       className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear ${invColor}`}
@@ -241,19 +261,19 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                     >
                       <ChordDiagram voicing={v} width={140} />
                       <div className="mt-1.5 flex flex-col items-center gap-0.5">
-                        <span className="text-[10px] font-semibold text-foreground">
-                          {v.inversion}
+                        <span className="text-[9px] text-muted-foreground">
+                          Cordas {v.stringSet} • Casa {v.startFret || 'aberta'}
                         </span>
                         <span className="text-[9px] text-muted-foreground font-mono">
                           Forma {v.cagedShape}
                         </span>
                       </div>
                     </div>
-                  );
-                })}
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

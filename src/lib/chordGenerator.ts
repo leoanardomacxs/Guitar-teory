@@ -126,11 +126,14 @@ export function generateTriadInversions(root: string, chordType: string): TriadV
     { strings: [0, 1, 2], label: '4-5-6' },  // E, A, D (bass)
   ];
 
-  // Three inversions: root position, 1st, 2nd
+  // Three inversions based on which note is in the bass (lowest string)
+  // Root position: Root is the lowest note (e.g. C E G from low to high)
+  // 1st inversion: 3rd is the lowest note (e.g. E G C from low to high)  
+  // 2nd inversion: 5th is the lowest note (e.g. G C E from low to high)
   const inversions = [
-    { name: 'Fundamental', order: [0, 1, 2] },  // R 3 5
-    { name: '1ª Inversão', order: [1, 2, 0] },   // 3 5 R
-    { name: '2ª Inversão', order: [2, 0, 1] },   // 5 R 3
+    { name: 'Fundamental', bassInterval: 0, order: [0, 1, 2] },  // R(bass) 3 5
+    { name: '1ª Inversão', bassInterval: 1, order: [1, 2, 0] },   // 3(bass) 5 R
+    { name: '2ª Inversão', bassInterval: 2, order: [2, 0, 1] },   // 5(bass) R 3
   ];
 
   const results: TriadVoicing[] = [];
@@ -218,7 +221,14 @@ export function generateTriadInversions(root: string, chordType: string): TriadV
     }
   }
 
-  unique.sort((a, b) => a.score - b.score);
+  // Sort by: inversion order first, then by startFret (closer to nut = first)
+  const invOrder = ['Fundamental', '1ª Inversão', '2ª Inversão'];
+  unique.sort((a, b) => {
+    const invA = invOrder.indexOf(a.inversion);
+    const invB = invOrder.indexOf(b.inversion);
+    if (invA !== invB) return invA - invB;
+    return a.startFret - b.startFret;
+  });
   return unique;
 }
 
