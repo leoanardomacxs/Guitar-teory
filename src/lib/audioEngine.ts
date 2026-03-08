@@ -66,7 +66,15 @@ export const TIMBRE_LIST: { key: TimbreType; label: string; icon: string }[] = [
   { key: 'electric', label: 'Guitarra Elétrica', icon: '' },
   { key: 'synth', label: 'Sintetizador', icon: '' },
   { key: 'organ', label: 'Órgão', icon: '' },
-  { key: 'bell', label: 'Sino / Bell', icon: '' },
+  { key: 'bell', label: 'Sino', icon: '' },
+  { key: 'harpsichord', label: 'Cravo', icon: '' },
+  { key: 'strings', label: 'Cordas', icon: '' },
+  { key: 'flute', label: 'Flauta', icon: '' },
+  { key: 'harmonica', label: 'Gaita', icon: '' },
+  { key: 'musicbox', label: 'Caixinha de Música', icon: '' },
+  { key: 'sitar', label: 'Sitar', icon: '' },
+  { key: 'marimba', label: 'Marimba', icon: '' },
+  { key: 'brass', label: 'Metais', icon: '' },
 ];
 
 interface TimbreDef {
