@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import GuitarFretboard from '@/components/GuitarFretboard';
-import ControlPanel, { type ViewMode } from '@/components/ControlPanel';
+import ControlPanel, { type ViewMode, DEGREE_PALETTES, NOTE_PALETTES, FUNCTION_PALETTES } from '@/components/ControlPanel';
 import ChordGeneratorView from '@/components/ChordGeneratorView';
 import ProgressionGeneratorView from '@/components/ProgressionGeneratorView';
 import {
@@ -31,6 +31,7 @@ const Index: React.FC = () => {
   const [showPentatonic, setShowPentatonic] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [colorMode, setColorMode] = useState<'degree' | 'note' | 'function'>('degree');
+  const [colorVariant, setColorVariant] = useState(0);
   const [noteSize, setNoteSize] = useState(14);
   const [show24Frets, setShow24Frets] = useState(false);
 
@@ -49,6 +50,23 @@ const Index: React.FC = () => {
   useEffect(() => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
+
+  // Apply color variant as CSS variables
+  useEffect(() => {
+    const root = document.documentElement;
+    if (colorMode === 'degree') {
+      const palette = DEGREE_PALETTES[colorVariant] || DEGREE_PALETTES[0];
+      for (let i = 0; i < 7; i++) {
+        root.style.setProperty(`--degree-${i + 1}`, palette[i]);
+      }
+    } else {
+      // Reset to default degree colors when not in degree mode
+      const defaults = DEGREE_PALETTES[0];
+      for (let i = 0; i < 7; i++) {
+        root.style.setProperty(`--degree-${i + 1}`, defaults[i]);
+      }
+    }
+  }, [colorMode, colorVariant]);
 
   const scaleNotes = useMemo(() => filterByScale(allFretNotes, root, scaleType), [root, scaleType]);
 
@@ -72,6 +90,7 @@ const Index: React.FC = () => {
                 showNoteNames={getShowNotes()}
                 showDegrees={getShowDegrees()}
                 colorMode={colorMode}
+                colorVariant={colorVariant}
                 noteRadius={noteSize}
                 title={`${root} ${scaleType}`}
                 subtitle={viewMode === 'tensions' ? 'Tensões destacadas' : undefined}
@@ -95,6 +114,7 @@ const Index: React.FC = () => {
                 showNoteNames={false}
                 showDegrees={true}
                 colorMode={colorMode}
+                colorVariant={colorVariant}
                 noteRadius={noteSize}
                 title={`Intervalos de ${root} ${scaleType}`}
               />
@@ -134,6 +154,7 @@ const Index: React.FC = () => {
                 maxFret={currentMaxFret}
                 showNoteNames={true}
                 colorMode={colorMode}
+                colorVariant={colorVariant}
                 noteRadius={noteSize}
               />
             </div>
@@ -165,6 +186,7 @@ const Index: React.FC = () => {
             maxFret={currentMaxFret}
             showNoteNames={true}
             colorMode={colorMode}
+            colorVariant={colorVariant}
             noteRadius={noteSize}
             title={`Acorde ${selectedChord.name}`}
             subtitle={`Notas: ${selectedChord.notes.join(' ')}`}
@@ -177,6 +199,7 @@ const Index: React.FC = () => {
               maxFret={currentMaxFret}
               showNoteNames={true}
               colorMode={colorMode}
+              colorVariant={colorVariant}
               noteRadius={noteSize}
               title={`Arpejo de ${selectedChord.name}`}
             />
@@ -190,6 +213,7 @@ const Index: React.FC = () => {
               showNoteNames={true}
               showDegrees={true}
               colorMode={colorMode}
+              colorVariant={colorVariant}
               noteRadius={noteSize}
               title={`Pentatônica de ${selectedChord.root}`}
             />
@@ -201,6 +225,7 @@ const Index: React.FC = () => {
             maxFret={currentMaxFret}
             showNoteNames={true}
             colorMode={colorMode}
+            colorVariant={colorVariant}
             noteRadius={noteSize * 0.85}
             title={`Escala do Tom (${root} ${scaleType})`}
           />
@@ -248,6 +273,7 @@ const Index: React.FC = () => {
                 showNoteNames={true}
                 showDegrees={true}
                 colorMode={colorMode}
+                colorVariant={colorVariant}
                 noteRadius={noteSize * 0.9}
                 title={`${ch.romanNumeral} — ${isPentatonic ? `${ch.root} ${scType}` : ch.name}`}
                 subtitle={`Notas: ${getScale(ch.root, scType).join(' – ')}`}
@@ -273,6 +299,7 @@ const Index: React.FC = () => {
                 maxFret={12}
                 showNoteNames={true}
                 colorMode={colorMode}
+                colorVariant={colorVariant}
                 compact={true}
                 noteRadius={noteSize * 0.7}
                 title={`${ch.romanNumeral} — ${ch.name}`}
@@ -301,6 +328,7 @@ const Index: React.FC = () => {
                 showNoteNames={true}
                 showDegrees={true}
                 colorMode={colorMode}
+                colorVariant={colorVariant}
                 noteRadius={noteSize * 0.9}
                 title={`${note} ${quality}`}
               />
@@ -335,6 +363,7 @@ const Index: React.FC = () => {
             maxFret={currentMaxFret}
             showNoteNames={true}
             colorMode={colorMode}
+            colorVariant={colorVariant}
             noteRadius={noteSize}
             title={`Notas Alvo — ${selectedChord.name}`}
             subtitle="Chord tones"
@@ -347,6 +376,7 @@ const Index: React.FC = () => {
             showNoteNames={true}
             showDegrees={true}
             colorMode={colorMode}
+            colorVariant={colorVariant}
             noteRadius={noteSize}
             title={`Pentatônica — ${selectedChord.root}`}
           />
@@ -357,6 +387,7 @@ const Index: React.FC = () => {
             maxFret={currentMaxFret}
             showNoteNames={true}
             colorMode={colorMode}
+            colorVariant={colorVariant}
             noteRadius={noteSize * 0.85}
             title={`Escala Completa — ${root} ${scaleType}`}
           />
@@ -404,6 +435,7 @@ const Index: React.FC = () => {
         showPentatonic={showPentatonic} setShowPentatonic={setShowPentatonic}
         darkMode={darkMode} setDarkMode={setDarkMode}
         colorMode={colorMode} setColorMode={setColorMode}
+        colorVariant={colorVariant} setColorVariant={setColorVariant}
         noteSize={noteSize} setNoteSize={setNoteSize}
         show24Frets={show24Frets} setShow24Frets={setShow24Frets}
       />
