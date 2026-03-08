@@ -173,7 +173,20 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
             </div>
           )}
         </div>
-      </div>
+
+        {/* Chord formula */}
+        {chordFormula.notes.length > 0 && (
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card">
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-foreground">
+                {chordFormula.notes.join(' + ')}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {chordFormula.intervals.join(' · ')}
+              </span>
+            </div>
+          </div>
+        )}
 
       {/* Results count + difficulty legend */}
       <div className="flex items-center justify-between flex-wrap gap-2">
