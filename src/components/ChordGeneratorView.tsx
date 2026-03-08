@@ -175,18 +175,30 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
           )}
         </div>
 
-        {/* Chord formula */}
+        {/* Chord formula toggle */}
         {chordFormula.notes.length > 0 && (
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card">
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-foreground">
+          <button
+            onClick={() => setShowNotes(!showNotes)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all cursor-pointer ${
+              showNotes
+                ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
+                : 'border-border bg-card hover:bg-secondary/60'
+            }`}
+          >
+            <div className="flex flex-col text-left">
+              <span className={`text-sm font-bold ${showNotes ? 'text-primary' : 'text-foreground'}`}>
                 {chordFormula.notes.join(' + ')}
               </span>
               <span className="text-[10px] text-muted-foreground">
                 {chordFormula.intervals.join(' · ')}
               </span>
             </div>
-          </div>
+            <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${
+              showNotes ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+            }`}>
+              {showNotes ? 'ON' : 'OFF'}
+            </span>
+          </button>
         )}
       </div>
 
