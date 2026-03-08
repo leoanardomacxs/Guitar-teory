@@ -51,6 +51,23 @@ const Index: React.FC = () => {
     document.documentElement.classList.toggle('dark', darkMode);
   }, [darkMode]);
 
+  // Apply color variant as CSS variables
+  useEffect(() => {
+    const root = document.documentElement;
+    if (colorMode === 'degree') {
+      const palette = DEGREE_PALETTES[colorVariant] || DEGREE_PALETTES[0];
+      for (let i = 0; i < 7; i++) {
+        root.style.setProperty(`--degree-${i + 1}`, palette[i]);
+      }
+    } else {
+      // Reset to default degree colors when not in degree mode
+      const defaults = DEGREE_PALETTES[0];
+      for (let i = 0; i < 7; i++) {
+        root.style.setProperty(`--degree-${i + 1}`, defaults[i]);
+      }
+    }
+  }, [colorMode, colorVariant]);
+
   const scaleNotes = useMemo(() => filterByScale(allFretNotes, root, scaleType), [root, scaleType]);
 
   const getShowNotes = (): boolean => ['full', 'notes', 'notes-degrees', 'chord', 'improvisation', 'tensions'].includes(viewMode);
