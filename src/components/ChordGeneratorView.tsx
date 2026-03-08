@@ -59,6 +59,16 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
   const chordName = `${root}${typeDef?.label || ''}`;
   const isTriadType = TRIAD_TYPES.includes(selectedType);
 
+  // Compute chord notes and interval names
+  const chordFormula = useMemo(() => {
+    if (!typeDef) return { notes: [], intervals: [] };
+    const rootIdx = NOTES.indexOf(root);
+    if (rootIdx < 0) return { notes: [], intervals: [] };
+    const notes = typeDef.intervals.map(i => NOTES[(rootIdx + i) % 12]);
+    const intervals = typeDef.intervals.map(i => INTERVAL_NAMES[i % 12] || `${i}ª`);
+    return { notes, intervals };
+  }, [root, typeDef]);
+
   // Group triads by inversion type, sorted by fret position (closest to nut first)
   const groupedTriads = useMemo(() => {
     if (!isTriadType || triadInversions.length === 0) return [];
