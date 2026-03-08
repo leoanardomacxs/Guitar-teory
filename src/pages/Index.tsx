@@ -6,6 +6,7 @@ import ProgressionGeneratorView from '@/components/ProgressionGeneratorView';
 import {
   getScale,
   getHarmonicField,
+  getHarmonicFieldForScale,
   getFretboardNotes,
   filterByScale,
   filterByNotes,
