@@ -31,6 +31,7 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
   const [selectedType, setSelectedType] = useState('major');
   const [rootOpen, setRootOpen] = useState(false);
   const [typeOpen, setTypeOpen] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const typeRef = useRef<HTMLDivElement>(null);
   const categories = useMemo(() => getChordTypeCategories(), []);
@@ -174,18 +175,30 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
           )}
         </div>
 
-        {/* Chord formula */}
+        {/* Chord formula toggle */}
         {chordFormula.notes.length > 0 && (
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card">
-            <div className="flex flex-col">
-              <span className="text-sm font-bold text-foreground">
+          <button
+            onClick={() => setShowNotes(!showNotes)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all cursor-pointer ${
+              showNotes
+                ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
+                : 'border-border bg-card hover:bg-secondary/60'
+            }`}
+          >
+            <div className="flex flex-col text-left">
+              <span className={`text-sm font-bold ${showNotes ? 'text-primary' : 'text-foreground'}`}>
                 {chordFormula.notes.join(' + ')}
               </span>
               <span className="text-[10px] text-muted-foreground">
                 {chordFormula.intervals.join(' · ')}
               </span>
             </div>
-          </div>
+            <span className={`text-[9px] font-medium px-1.5 py-0.5 rounded ${
+              showNotes ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'
+            }`}>
+              {showNotes ? 'ON' : 'OFF'}
+            </span>
+          </button>
         )}
       </div>
 
@@ -229,7 +242,7 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                 className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear ${difficultyColor} ${difficultyBg}`}
                 style={{ animationDelay: `${i * 20}ms` }}
               >
-                <ChordDiagram voicing={v} width={140} />
+                <ChordDiagram voicing={v} width={140} showNotes={showNotes} />
                 <div className="mt-1 text-[10px] text-muted-foreground font-mono">
                   {v.frets.map(f => f === null ? 'X' : String(f)).join(' ')}
                 </div>
@@ -293,7 +306,7 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                       className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear ${invColor}`}
                       style={{ animationDelay: `${i * 30}ms` }}
                     >
-                      <ChordDiagram voicing={v} width={140} />
+                      <ChordDiagram voicing={v} width={140} showNotes={showNotes} />
                       <div className="mt-1.5 flex flex-col items-center gap-0.5">
                         <span className="text-[9px] text-muted-foreground">
                           Cordas {v.stringSet} • Casa {v.startFret || 'aberta'}
