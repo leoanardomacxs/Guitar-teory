@@ -93,6 +93,7 @@ const COLOR_VARIANT_COUNTS: Record<string, number> = {
 export { DEGREE_PALETTES, NOTE_PALETTES, FUNCTION_PALETTES };
 
 
+const VIEW_MODES: { value: ViewMode; label: string; icon: string }[] = [
   { value: 'full', label: 'Escala Completa', icon: '' },
   { value: 'intervals', label: 'Intervalos', icon: '' },
   { value: 'notes', label: 'Notas', icon: '' },
