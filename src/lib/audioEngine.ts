@@ -17,7 +17,13 @@ export interface AudioSettings {
   timbre: TimbreType;
   reverb: number;       // 0–1
   delay: number;        // 0–1
+  delayTime: number;    // 0.05–1.0 seconds
+  delayFeedback: number;// 0–0.9
   brightness: number;   // 0–1
+  distortion: number;   // 0–1
+  vibrato: number;      // 0–1
+  vibratoSpeed: number; // 1–12 Hz
+  octave: number;       // -2 to +2
 }
 
 const defaultSettings: AudioSettings = {
@@ -26,7 +32,13 @@ const defaultSettings: AudioSettings = {
   timbre: 'guitar',
   reverb: 0.2,
   delay: 0,
+  delayTime: 0.3,
+  delayFeedback: 0.3,
   brightness: 0.5,
+  distortion: 0,
+  vibrato: 0,
+  vibratoSpeed: 5,
+  octave: 0,
 };
 
 let settings: AudioSettings = { ...defaultSettings };
