@@ -118,6 +118,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
         Gerador de Acordes
       </button>
 
+      {/* Progressões — botão exclusivo */}
+      <button
+        onClick={() => { playClick(500); setViewMode('progressions'); }}
+        className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+          viewMode === 'progressions'
+            ? 'bg-primary text-primary-foreground shadow-md'
+            : 'bg-secondary text-foreground hover:bg-secondary/80'
+        }`}
+      >
+        <span>🔄</span>
+        Progressões
+      </button>
+
       {/* Escala */}
       <Section title="Escala" collapsible defaultOpen={false}>
         {Object.entries(SCALE_CATEGORIES).map(([cat, scales]) => (
