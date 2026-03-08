@@ -100,7 +100,7 @@ const ChordDiagram: React.FC<ChordDiagramProps> = ({ voicing, width = 160, showN
                 className="fill-primary"
                 style={{ fontSize: 9, fontWeight: 700, fontFamily: 'Inter, sans-serif' }}
               >
-                {getNoteName(s, 0)}
+                {getChordNoteName(s, 0)}
               </text>
             );
           }
@@ -180,7 +180,7 @@ const ChordDiagram: React.FC<ChordDiagramProps> = ({ voicing, width = 160, showN
         const x = getX(s);
         const y = getY(f);
         const isBarreFret = barreInfo && f === barreInfo.fret && s >= barreInfo.fromString && s <= barreInfo.toString;
-        const noteName = getNoteName(s, f);
+        const noteName = getChordNoteName(s, f);
 
         return (
           <g key={`dot-${s}`} className="note-appear" style={{ animationDelay: `${s * 30}ms` }}>
