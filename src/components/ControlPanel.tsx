@@ -251,6 +251,9 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       <Section title="Tema">
         <Toggle label="Modo Noturno" checked={darkMode} onChange={setDarkMode} />
       </Section>
+
+      {/* User info */}
+      <UserFooter />
     </aside>
   );
 };
