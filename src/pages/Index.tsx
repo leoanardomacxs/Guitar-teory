@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import GuitarFretboard from '@/components/GuitarFretboard';
-import ControlPanel, { type ViewMode } from '@/components/ControlPanel';
+import ControlPanel, { type ViewMode, DEGREE_PALETTES, NOTE_PALETTES, FUNCTION_PALETTES } from '@/components/ControlPanel';
 import ChordGeneratorView from '@/components/ChordGeneratorView';
 import ProgressionGeneratorView from '@/components/ProgressionGeneratorView';
 import {
