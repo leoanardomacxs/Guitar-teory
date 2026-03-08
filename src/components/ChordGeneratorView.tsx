@@ -2,8 +2,14 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import ChordDiagram from './ChordDiagram';
 import { generateChordVoicings, generateTriadInversions, getChordTypeCategories, CHORD_TYPES } from '@/lib/chordGenerator';
 import type { TriadVoicing } from '@/lib/chordGenerator';
-import { ALL_ROOTS } from '@/lib/musicTheory';
+import { ALL_ROOTS, NOTES } from '@/lib/musicTheory';
 import { ChevronDown } from 'lucide-react';
+
+const INTERVAL_NAMES: Record<number, string> = {
+  0: 'Tônica', 2: '2ª maior', 3: '3ª menor', 4: '3ª maior',
+  5: '4ª justa', 6: '5ª dim', 7: '5ª justa', 8: '5ª aum',
+  9: '6ª maior', 10: '7ª menor', 11: '7ª maior', 14: '9ª maior',
+};
 
 interface ChordGeneratorViewProps {
   root: string;
@@ -52,6 +58,16 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
   const typeDef = CHORD_TYPES[selectedType];
   const chordName = `${root}${typeDef?.label || ''}`;
   const isTriadType = TRIAD_TYPES.includes(selectedType);
+
+  // Compute chord notes and interval names
+  const chordFormula = useMemo(() => {
+    if (!typeDef) return { notes: [], intervals: [] };
+    const rootIdx = (NOTES as readonly string[]).indexOf(root);
+    if (rootIdx < 0) return { notes: [], intervals: [] };
+    const notes = typeDef.intervals.map(i => NOTES[(rootIdx + i) % 12]);
+    const intervals = typeDef.intervals.map(i => INTERVAL_NAMES[i % 12] || `${i}ª`);
+    return { notes, intervals };
+  }, [root, typeDef]);
 
   // Group triads by inversion type, sorted by fret position (closest to nut first)
   const groupedTriads = useMemo(() => {
@@ -157,6 +173,20 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
             </div>
           )}
         </div>
+
+        {/* Chord formula */}
+        {chordFormula.notes.length > 0 && (
+          <div className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card">
+            <div className="flex flex-col">
+              <span className="text-sm font-bold text-foreground">
+                {chordFormula.notes.join(' + ')}
+              </span>
+              <span className="text-[10px] text-muted-foreground">
+                {chordFormula.intervals.join(' · ')}
+              </span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Results count + difficulty legend */}
