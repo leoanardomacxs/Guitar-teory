@@ -154,6 +154,9 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
         <p className="text-sm text-muted-foreground mt-0.5">
           Gere progressões harmônicas baseadas no campo de <span className="font-semibold text-foreground">{root} {fieldType}</span>
         </p>
+        <p className="text-[10px] text-muted-foreground/60 mt-1 italic">
+          Progressões são sequências de acordes que formam a base de músicas. Clique "Gerar Aleatória" ou escolha uma progressão clássica abaixo. Clique nos acordes para ouvir.
+        </p>
       </div>
 
       {/* Field type selector */}
@@ -175,7 +178,7 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
 
       {/* Harmonic field overview */}
       <div className="bg-card border border-border rounded-lg p-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-1">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Campo Harmônico de {root} {fieldType}</p>
           <button
             onClick={() => setShowHarmonicField(!showHarmonicField)}
@@ -184,6 +187,7 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
             {showHarmonicField ? 'Ocultar' : 'Exibir'}
           </button>
         </div>
+        <p className="text-[9px] text-muted-foreground/60 italic mb-2">Os 7 acordes que pertencem a esta tonalidade. As progressões usam esses acordes.</p>
         {showHarmonicField && (
           <div className="flex flex-wrap gap-2 note-appear">
             {harmonicField.map((ch, i) => (
@@ -364,7 +368,7 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
       {/* Preset progressions */}
       <div className="space-y-3 pt-4 border-t border-border">
         <h3 className="text-sm font-bold text-foreground">Progressões Clássicas</h3>
-        <p className="text-xs text-muted-foreground">Clique para carregar uma progressão famosa</p>
+        <p className="text-xs text-muted-foreground">Clique para carregar. São sequências usadas em milhares de músicas famosas.</p>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
           {PRESET_PROGRESSIONS.map((preset, i) => {
             const chordNames = preset.degrees.map(d => harmonicField[d - 1].name).join(' → ');
