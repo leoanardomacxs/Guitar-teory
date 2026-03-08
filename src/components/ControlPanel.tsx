@@ -85,33 +85,42 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       {/* Tonalidade */}
       <Section title="Tonalidade">
         <div className="grid grid-cols-6 gap-1">
-          {ALL_ROOTS.map(n => (
-            <button
-              key={n}
-              onClick={() => {
-                setRoot(n);
-                const formula = SCALE_FORMULAS[scaleType];
-                if (formula) {
-                  playScale(getScaleMidiNotes(n, formula), 0.2, 0.4);
-                }
-              }}
-              onDoubleClick={(e) => {
-                e.preventDefault();
-                const enharmonic = ENHARMONIC_MAP[root];
-                if (enharmonic && root === n) {
-                  setRoot(enharmonic);
-                  playClick(800);
-                }
-              }}
-              className={`px-1 py-1.5 rounded text-xs font-semibold transition-all ${
-                root === n
-                  ? 'bg-primary text-primary-foreground shadow-sm'
-                  : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-              }`}
-            >
-              {n}
-            </button>
-          ))}
+          {ALL_ROOTS.map(n => {
+            const isActive = root === n || ENHARMONIC_MAP[root] === n;
+            return (
+              <button
+                key={n}
+                onClick={() => {
+                  if (isActive && root !== n) {
+                    // Already on enharmonic of this note, just switch to standard
+                    setRoot(n);
+                  } else {
+                    setRoot(n);
+                  }
+                  const formula = SCALE_FORMULAS[scaleType];
+                  if (formula) {
+                    playScale(getScaleMidiNotes(n, formula), 0.2, 0.4);
+                  }
+                }}
+                onDoubleClick={(e) => {
+                  e.preventDefault();
+                  const currentNote = isActive ? (root === n ? n : root) : n;
+                  const enharmonic = ENHARMONIC_MAP[currentNote];
+                  if (enharmonic) {
+                    setRoot(enharmonic);
+                    playClick(800);
+                  }
+                }}
+                className={`px-1 py-1.5 rounded text-xs font-semibold transition-all ${
+                  isActive
+                    ? 'bg-primary text-primary-foreground shadow-sm'
+                    : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+                }`}
+              >
+                {isActive && root !== n ? root : n}
+              </button>
+            );
+          })}
         </div>
         {/* Show current root if it's an enharmonic variant */}
         {!ALL_ROOTS.includes(root) && (
