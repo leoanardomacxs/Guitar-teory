@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import type { FretNote } from '@/lib/musicTheory';
 import { playNote } from '@/lib/audioEngine';
+import { NOTE_PALETTES, FUNCTION_PALETTES } from '@/components/ControlPanel';
 
 interface GuitarFretboardProps {
   notes: FretNote[];
@@ -14,6 +15,7 @@ interface GuitarFretboardProps {
   subtitle?: string;
   noteRadius?: number;
   allowVertical?: boolean;
+  colorVariant?: number;
 }
 
 const INLAY_FRETS = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
