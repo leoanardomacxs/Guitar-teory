@@ -178,15 +178,16 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
 
       {/* Harmonic field overview */}
       <div className="bg-card border border-border rounded-lg p-4">
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-1">
           <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Campo Harmônico de {root} {fieldType}</p>
-          <p className="text-[9px] text-muted-foreground/60 italic">Os 7 acordes que pertencem a esta tonalidade. As progressões usam esses acordes.</p>
+          <button
             onClick={() => setShowHarmonicField(!showHarmonicField)}
             className="text-[10px] font-semibold px-2 py-0.5 rounded transition-all bg-secondary text-muted-foreground hover:text-foreground"
           >
             {showHarmonicField ? 'Ocultar' : 'Exibir'}
           </button>
         </div>
+        <p className="text-[9px] text-muted-foreground/60 italic mb-2">Os 7 acordes que pertencem a esta tonalidade. As progressões usam esses acordes.</p>
         {showHarmonicField && (
           <div className="flex flex-wrap gap-2 note-appear">
             {harmonicField.map((ch, i) => (
