@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import {
   ALL_ROOTS,
+  ENHARMONIC_MAP,
   SCALE_CATEGORIES,
   SCALE_FORMULAS,
   type ChordInfo,
@@ -94,6 +95,14 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
                   playScale(getScaleMidiNotes(n, formula), 0.2, 0.4);
                 }
               }}
+              onDoubleClick={(e) => {
+                e.preventDefault();
+                const enharmonic = ENHARMONIC_MAP[root];
+                if (enharmonic && root === n) {
+                  setRoot(enharmonic);
+                  playClick(800);
+                }
+              }}
               className={`px-1 py-1.5 rounded text-xs font-semibold transition-all ${
                 root === n
                   ? 'bg-primary text-primary-foreground shadow-sm'
@@ -104,6 +113,17 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             </button>
           ))}
         </div>
+        {/* Show current root if it's an enharmonic variant */}
+        {!ALL_ROOTS.includes(root) && (
+          <div className="mt-1.5 text-center">
+            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded">
+              {root}
+            </span>
+            <span className="text-[10px] text-muted-foreground ml-1">
+              (clique duplo para voltar)
+            </span>
+          </div>
+        )}
       </Section>
 
       {/* Gerador de Acordes — botão exclusivo */}
