@@ -4,6 +4,7 @@ import { generateChordVoicings, generateTriadInversions, getChordTypeCategories,
 import type { TriadVoicing, ChordVoicing } from '@/lib/chordGenerator';
 import { ALL_ROOTS, NOTES } from '@/lib/musicTheory';
 import { ChevronDown } from 'lucide-react';
+import { playChordFromFrets, playClick } from '@/lib/audioEngine';
 
 const INTERVAL_NAMES: Record<number, string> = {
   0: 'Tônica', 2: '2ª maior', 3: '3ª menor', 4: '3ª maior',
@@ -132,7 +133,7 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
               {ALL_ROOTS.map(n => (
                 <button
                   key={n}
-                  onClick={() => { setRoot(n); setRootOpen(false); }}
+                  onClick={() => { playClick(600); setRoot(n); setRootOpen(false); }}
                   className={`px-3 py-2 rounded-md text-xs font-semibold transition-all ${
                     root === n
                       ? 'bg-primary text-primary-foreground shadow-sm'
@@ -167,7 +168,7 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                     {cat.types.map(t => (
                       <button
                         key={t.key}
-                        onClick={() => { setSelectedType(t.key); setTypeOpen(false); }}
+                        onClick={() => { playClick(700); setSelectedType(t.key); setTypeOpen(false); }}
                         className={`px-2.5 py-1.5 rounded-md text-xs font-medium transition-all ${
                           selectedType === t.key
                             ? 'bg-primary text-primary-foreground shadow-sm'
@@ -261,8 +262,9 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
             return (
               <div
                 key={i}
-                className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear ${difficultyColor} ${difficultyBg}`}
+                className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear cursor-pointer ${difficultyColor} ${difficultyBg}`}
                 style={{ animationDelay: `${i * 20}ms` }}
+                onClick={() => playChordFromFrets(v.frets)}
               >
                 <ChordDiagram voicing={v} width={140} showNotes={showNotes} />
                 <div className="mt-1 text-[10px] text-muted-foreground font-mono">
@@ -325,8 +327,9 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                   {triadVoicings.map((v, i) => (
                     <div
                       key={i}
-                      className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear ${invColor}`}
+                      className={`border rounded-lg p-2 flex flex-col items-center hover:shadow-md transition-shadow note-appear cursor-pointer ${invColor}`}
                       style={{ animationDelay: `${i * 30}ms` }}
+                      onClick={() => playChordFromFrets(v.frets)}
                     >
                       <ChordDiagram voicing={v} width={140} showNotes={showNotes} />
                       <div className="mt-1.5 flex flex-col items-center gap-0.5">
