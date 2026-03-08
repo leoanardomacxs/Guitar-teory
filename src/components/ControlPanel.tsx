@@ -81,7 +81,13 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
           {ALL_ROOTS.map(n => (
             <button
               key={n}
-              onClick={() => { playClick(600 + ALL_ROOTS.indexOf(n) * 40); setRoot(n); }}
+              onClick={() => {
+                setRoot(n);
+                const formula = SCALE_FORMULAS[scaleType];
+                if (formula) {
+                  playScale(getScaleMidiNotes(n, formula), 0.2, 0.4);
+                }
+              }}
               className={`px-1 py-1.5 rounded text-xs font-semibold transition-all ${
                 root === n
                   ? 'bg-primary text-primary-foreground shadow-sm'
