@@ -391,7 +391,7 @@ const HarmonicFieldView: React.FC<HarmonicFieldViewProps> = ({ root, setRoot }) 
                   {triadField.filter((_, i) => [1, 3].includes(i)).map(c => c.romanNumeral).join(', ')}
                 </p>
               </div>
-              <div className="p-2 rounded-lg bg-orange-500/10 border border-orange-500/30">
+              <div className="p-2 rounded-lg bg-red-500/10 border border-red-500/30">
                 <span className="font-bold text-foreground">Dominante</span>
                 <p className="text-muted-foreground mt-0.5">Tensão, resolução</p>
                 <p className="font-mono text-foreground mt-1">
