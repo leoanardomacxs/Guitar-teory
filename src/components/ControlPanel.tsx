@@ -9,7 +9,7 @@ export type ViewMode =
   | 'full' | 'position' | 'caged' | 'intervals' | 'notes' 
   | 'degrees' | 'notes-degrees' | 'tensions'
   | 'chord' | 'harmonic-field' | 'harmonic-matrix'
-  | 'compare-pentatonics' | 'improvisation';
+  | 'compare-pentatonics' | 'improvisation' | 'chord-engine';
 
 interface ControlPanelProps {
   root: string;
@@ -47,6 +47,7 @@ const VIEW_MODES: { value: ViewMode; label: string; icon: string }[] = [
   { value: 'harmonic-matrix', label: 'Matriz Harmônica', icon: '📊' },
   { value: 'compare-pentatonics', label: 'Comparar Pentatônicas', icon: '🔄' },
   { value: 'improvisation', label: 'Improvisação', icon: '🎤' },
+  { value: 'chord-engine', label: 'Chord Engine', icon: '⚙️' },
 ];
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
