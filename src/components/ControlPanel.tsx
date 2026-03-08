@@ -16,7 +16,7 @@ export type ViewMode =
   | 'full' | 'position' | 'caged' | 'intervals' | 'notes' 
   | 'degrees' | 'notes-degrees' | 'tensions'
   | 'chord' | 'harmonic-field' | 'harmonic-matrix'
-  | 'compare-pentatonics' | 'improvisation' | 'chord-generator';
+  | 'compare-pentatonics' | 'improvisation' | 'chord-generator' | 'progressions';
 
 interface ControlPanelProps {
   root: string;
@@ -116,6 +116,19 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
       >
         <span>🎹</span>
         Gerador de Acordes
+      </button>
+
+      {/* Progressões — botão exclusivo */}
+      <button
+        onClick={() => { playClick(500); setViewMode('progressions'); }}
+        className={`w-full flex items-center gap-2 px-3 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
+          viewMode === 'progressions'
+            ? 'bg-primary text-primary-foreground shadow-md'
+            : 'bg-secondary text-foreground hover:bg-secondary/80'
+        }`}
+      >
+        <span>🔄</span>
+        Progressões
       </button>
 
       {/* Escala */}
