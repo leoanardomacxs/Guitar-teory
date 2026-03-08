@@ -433,15 +433,18 @@ export function filterByNotes(allNotes: FretNote[], targetNotes: string[], root:
 
 export const ALL_ROOTS = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
-/** Enharmonic equivalents (only simple ones, no double sharps/flats) */
+/** Enharmonic equivalents for all 12 notes */
 export const ENHARMONIC_MAP: Record<string, string> = {
   'C': 'B#', 'B#': 'C',
   'C#': 'Db', 'Db': 'C#',
+  'D': 'Ebb', 'Ebb': 'D',
   'D#': 'Eb', 'Eb': 'D#',
   'E': 'Fb', 'Fb': 'E',
   'F': 'E#', 'E#': 'F',
   'F#': 'Gb', 'Gb': 'F#',
+  'G': 'F##', 'F##': 'G',
   'G#': 'Ab', 'Ab': 'G#',
+  'A': 'Bbb', 'Bbb': 'A',
   'A#': 'Bb', 'Bb': 'A#',
   'B': 'Cb', 'Cb': 'B',
 };
