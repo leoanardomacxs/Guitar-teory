@@ -107,15 +107,15 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
 
       // Get a voicing and play it
       const qualityMap: Record<string, string> = {
-        'Major': 'major', 'minor': 'minor', 'diminished': 'dim',
+        'Major': 'major', 'minor': 'minor', 'diminished': 'dim', 'augmented': 'aug',
       };
       const typeKey = qualityMap[chord.quality] || 'major';
       const voicings = generateChordVoicings(chord.root, typeKey, 1);
       if (voicings.length > 0) {
         playChordFromFrets(voicings[0].frets);
       } else {
-        // fallback: play triad notes
-        const midiNotes = chord.notes.map(n => noteNameToMidi(n, 3));
+        // fallback: play triad notes spread across octaves for proper voicing
+        const midiNotes = chord.notes.map((n, idx) => noteNameToMidi(n, 3 + Math.floor(idx / 3)));
         playChord(midiNotes, 1.0);
       }
 

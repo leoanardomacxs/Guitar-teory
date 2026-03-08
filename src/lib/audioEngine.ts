@@ -303,19 +303,20 @@ function midiToFreq(midi: number): number {
   return 440 * Math.pow(2, (midi - 69) / 12);
 }
 
-const NOTE_TO_SEMI: Record<string, number> = {
-  'C': 0, 'C#': 1, 'Db': 1,
-  'D': 2, 'D#': 3, 'Eb': 3,
-  'E': 4, 'F': 5, 'F#': 6, 'Gb': 6,
-  'G': 7, 'G#': 8, 'Ab': 8,
-  'A': 9, 'A#': 10, 'Bb': 10,
-  'B': 11,
+const BASE_SEMI: Record<string, number> = {
+  'C': 0, 'D': 2, 'E': 4, 'F': 5, 'G': 7, 'A': 9, 'B': 11,
 };
 
 export function noteNameToMidi(name: string, octave = 4): number {
-  const semi = NOTE_TO_SEMI[name];
-  if (semi === undefined) return 60;
-  return 12 * (octave + 1) + semi;
+  if (!name || name.length === 0) return 60;
+  const base = BASE_SEMI[name[0]];
+  if (base === undefined) return 60;
+  let semi = base;
+  for (let i = 1; i < name.length; i++) {
+    if (name[i] === '#') semi++;
+    else if (name[i] === 'b') semi--;
+  }
+  return 12 * (octave + 1) + ((semi % 12) + 12) % 12;
 }
 
 // ─── Distortion ───
