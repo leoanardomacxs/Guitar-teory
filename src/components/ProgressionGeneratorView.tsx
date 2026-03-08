@@ -63,6 +63,7 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
   const [activeChordIdx, setActiveChordIdx] = useState<number | null>(null);
   const [history, setHistory] = useState<Array<{ degrees: number[]; chords: ChordInfo[] }>>([]);
   // all12 mode: generate in random key
+  const [displayMode, setDisplayMode] = useState<'full' | 'degrees' | 'hidden'>('full');
   const [allKeys, setAllKeys] = useState(false);
 
   const generateNew = useCallback(() => {
