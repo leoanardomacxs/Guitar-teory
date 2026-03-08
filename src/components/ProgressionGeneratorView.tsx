@@ -55,14 +55,21 @@ function generateRandomProgression(harmonicField: ChordInfo[], length = 4): { de
   return { degrees, chords };
 }
 
+const FIELD_TYPES = [
+  { value: 'Maior', label: 'Maior' },
+  { value: 'Menor Natural', label: 'Menor' },
+  { value: 'Menor Harmônica', label: 'Menor Harmônica' },
+  { value: 'Menor Melódica', label: 'Menor Melódica' },
+] as const;
+
 const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ root, setRoot }) => {
-  const harmonicField = useMemo(() => getHarmonicField(root), [root]);
+  const [fieldType, setFieldType] = useState('Maior');
+  const harmonicField = useMemo(() => getHarmonicFieldForScale(root, fieldType), [root, fieldType]);
   const [currentProgression, setCurrentProgression] = useState<{ degrees: number[]; chords: ChordInfo[] } | null>(null);
   const [progressionLength, setProgressionLength] = useState(4);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeChordIdx, setActiveChordIdx] = useState<number | null>(null);
   const [history, setHistory] = useState<Array<{ degrees: number[]; chords: ChordInfo[] }>>([]);
-  // all12 mode: generate in random key
   const [displayMode, setDisplayMode] = useState<'full' | 'degrees' | 'hidden'>('full');
   const [showHarmonicField, setShowHarmonicField] = useState(true);
   const [allKeys, setAllKeys] = useState(false);
@@ -73,13 +80,13 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
       targetRoot = ALL_ROOTS[Math.floor(Math.random() * ALL_ROOTS.length)];
       setRoot(targetRoot);
     }
-    const field = allKeys ? getHarmonicField(targetRoot) : harmonicField;
+    const field = allKeys ? getHarmonicFieldForScale(targetRoot, fieldType) : harmonicField;
     const prog = generateRandomProgression(field, progressionLength);
     setCurrentProgression(prog);
     setHistory(prev => [prog, ...prev].slice(0, 10));
     setActiveChordIdx(null);
     playClick(600);
-  }, [harmonicField, progressionLength, allKeys, root, setRoot]);
+  }, [harmonicField, progressionLength, allKeys, root, setRoot, fieldType]);
 
   const selectPreset = useCallback((degrees: number[]) => {
     const chords = degrees.map(d => harmonicField[d - 1]);
