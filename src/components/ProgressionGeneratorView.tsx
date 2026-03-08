@@ -181,6 +181,23 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
           </button>
         )}
 
+        {/* Ear training display toggle */}
+        <button
+          onClick={() => {
+            playClick(600);
+            setDisplayMode(prev => prev === 'full' ? 'degrees' : prev === 'degrees' ? 'hidden' : 'full');
+          }}
+          className={`px-4 py-2.5 rounded-lg font-semibold text-sm transition-all border ${
+            displayMode === 'full'
+              ? 'border-border bg-secondary text-foreground'
+              : displayMode === 'degrees'
+              ? 'border-amber-500/50 bg-amber-500/10 text-amber-700 dark:text-amber-400'
+              : 'border-red-500/50 bg-red-500/10 text-red-700 dark:text-red-400'
+          }`}
+        >
+          {displayMode === 'full' ? '👁️ Tudo Visível' : displayMode === 'degrees' ? '🎯 Só Graus' : '👂 Oculto (Treino)'}
+        </button>
+
         <div className="flex items-center gap-2 ml-auto">
           <span className="text-xs text-muted-foreground">Acordes:</span>
           {[3, 4, 5, 6, 8].map(len => (
