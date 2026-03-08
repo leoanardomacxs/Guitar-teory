@@ -62,6 +62,8 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeChordIdx, setActiveChordIdx] = useState<number | null>(null);
   const [history, setHistory] = useState<Array<{ degrees: number[]; chords: ChordInfo[] }>>([]);
+  // Display mode for ear training: 'full' | 'degrees' | 'hidden'
+  const [displayMode, setDisplayMode] = useState<'full' | 'degrees' | 'hidden'>('full');
 
   const generateNew = useCallback(() => {
     const prog = generateRandomProgression(harmonicField, progressionLength);
