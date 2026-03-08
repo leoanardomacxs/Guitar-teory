@@ -109,11 +109,6 @@ export function generateChordVoicings(root: string, chordType: string, maxResult
 /**
  * Generate CAGED triad inversions (only for triad chord types).
  */
-/**
- * Generate CAGED triad inversions (only for triad chord types).
- * Inversion is determined by the ACTUAL lowest sounding note (bass note),
- * using real MIDI pitches from standard tuning E2 A2 D3 G3 B3 E4.
- */
 export function generateTriadInversions(root: string, chordType: string): TriadVoicing[] {
   if (!TRIAD_TYPES.includes(chordType)) return [];
   
@@ -122,12 +117,8 @@ export function generateTriadInversions(root: string, chordType: string): TriadV
 
   const rootIdx = getNoteIndex(root);
   const intervals = typeDef.intervals;
-  const chordPitchClasses = intervals.map(i => (rootIdx + i) % 12);
-  // chordPitchClasses[0] = root, [1] = 3rd, [2] = 5th
   
-  const flats = useFlats(root);
-
-  // String sets for triads (index 0=low E, 5=high E)
+  // String sets for triads (guitar string indices, 0=low E, 5=high E)
   const stringSets: { strings: [number, number, number]; label: string }[] = [
     { strings: [3, 4, 5], label: '1-2-3' },  // G, B, E (treble)
     { strings: [2, 3, 4], label: '2-3-4' },  // D, G, B
@@ -135,86 +126,82 @@ export function generateTriadInversions(root: string, chordType: string): TriadV
     { strings: [0, 1, 2], label: '4-5-6' },  // E, A, D (bass)
   ];
 
+  // Three inversions: root position, 1st, 2nd
+  const inversions = [
+    { name: 'Fundamental', order: [0, 1, 2] },  // R 3 5
+    { name: '1ª Inversão', order: [1, 2, 0] },   // 3 5 R
+    { name: '2ª Inversão', order: [2, 0, 1] },   // 5 R 3
+  ];
+
   const results: TriadVoicing[] = [];
 
   for (const ss of stringSets) {
-    // For each string in the set, find all frets (0-12) that produce any chord tone
-    const stringFretOptions: { fret: number; pitchClass: number; midi: number }[][] = [];
-    for (const sIdx of ss.strings) {
-      const options: { fret: number; pitchClass: number; midi: number }[] = [];
-      for (let f = 0; f <= 12; f++) {
-        const midi = OPEN_STRINGS[sIdx] + f;
-        const pc = midi % 12;
-        if (chordPitchClasses.includes(pc)) {
-          options.push({ fret: f, pitchClass: pc, midi });
+    for (const inv of inversions) {
+      // Assign each note of the inversion to the 3 strings (low to high)
+      const targetNotes = inv.order.map(i => (rootIdx + intervals[i]) % 12);
+      
+      // Find fret positions for each string
+      const fretOptions: number[][] = [];
+      for (let i = 0; i < 3; i++) {
+        const stringIdx = ss.strings[i];
+        const openPitch = OPEN_STRINGS[stringIdx] % 12;
+        const options: number[] = [];
+        for (let f = 0; f <= 12; f++) {
+          if ((openPitch + f) % 12 === targetNotes[i]) {
+            options.push(f);
+          }
         }
+        fretOptions.push(options);
       }
-      stringFretOptions.push(options);
-    }
 
-    // Try all combinations where all 3 chord tones are covered
-    for (const o0 of stringFretOptions[0]) {
-      for (const o1 of stringFretOptions[1]) {
-        for (const o2 of stringFretOptions[2]) {
-          // Check all 3 pitch classes are present
-          const pcs = new Set([o0.pitchClass, o1.pitchClass, o2.pitchClass]);
-          if (pcs.size !== 3) continue; // Must have all 3 distinct chord tones
+      // Try all combinations
+      for (const f0 of fretOptions[0]) {
+        for (const f1 of fretOptions[1]) {
+          for (const f2 of fretOptions[2]) {
+            const fretted = [f0, f1, f2].filter(f => f > 0);
+            if (fretted.length === 0) {
+              // All open - valid
+            } else {
+              const minF = Math.min(...fretted);
+              const maxF = Math.max(...fretted);
+              if (maxF - minF > 4) continue; // Too wide
+            }
 
-          const fretValues = [o0.fret, o1.fret, o2.fret];
-          const fretted = fretValues.filter(f => f > 0);
-          
-          if (fretted.length > 0) {
-            const minF = Math.min(...fretted);
-            const maxF = Math.max(...fretted);
-            if (maxF - minF > 4) continue; // Too wide
+            // Build full 6-string voicing (mute others)
+            const fullFrets: (number | null)[] = [null, null, null, null, null, null];
+            fullFrets[ss.strings[0]] = f0;
+            fullFrets[ss.strings[1]] = f1;
+            fullFrets[ss.strings[2]] = f2;
+
+            const frettedAll = [f0, f1, f2].filter(f => f > 0);
+            const minFret = frettedAll.length > 0 ? Math.min(...frettedAll) : 0;
+            const maxFret = frettedAll.length > 0 ? Math.max(...frettedAll) : 0;
+            const span = maxFret - minFret;
+
+            const { fingers, barre, fingerCount } = assignFingers(fullFrets, frettedAll, minFret);
+            if (fingerCount > 4 || !fingers) continue;
+
+            const score =
+              span * 10 +
+              (minFret > 0 ? minFret * 2 : 0) +
+              fingerCount * 3;
+
+            const cagedShape = identifyCAGEDShape(fullFrets, ss.strings, rootIdx);
+
+            results.push({
+              root,
+              typeName: chordType,
+              typeLabel: typeDef.label,
+              frets: fullFrets,
+              fingers,
+              barreInfo: barre,
+              startFret: frettedAll.length > 0 ? minFret : 0,
+              score,
+              inversion: inv.name,
+              stringSet: ss.label,
+              cagedShape,
+            });
           }
-
-          // Build full 6-string voicing (mute unused strings)
-          const fullFrets: (number | null)[] = [null, null, null, null, null, null];
-          fullFrets[ss.strings[0]] = o0.fret;
-          fullFrets[ss.strings[1]] = o1.fret;
-          fullFrets[ss.strings[2]] = o2.fret;
-
-          const minFret = fretted.length > 0 ? Math.min(...fretted) : 0;
-          const maxFret = fretted.length > 0 ? Math.max(...fretted) : 0;
-          const span = maxFret - minFret;
-
-          const { fingers, barre, fingerCount } = assignFingers(fullFrets, fretted, minFret);
-          if (fingerCount > 4 || !fingers) continue;
-
-          // Determine inversion by the ACTUAL bass note (lowest MIDI pitch)
-          // ss.strings[0] is always the lowest-pitched string in the set
-          const bassPC = o0.pitchClass;
-          let inversion: string;
-          if (bassPC === chordPitchClasses[0]) {
-            inversion = 'Fundamental';
-          } else if (bassPC === chordPitchClasses[1]) {
-            inversion = '1ª Inversão';
-          } else {
-            inversion = '2ª Inversão';
-          }
-
-          // Identify CAGED shape from the geometric pattern
-          const cagedShape = identifyCAGEDShapeFromPattern(fretValues, ss.strings, rootIdx, inversion);
-
-          const score =
-            span * 10 +
-            (minFret > 0 ? minFret * 2 : 0) +
-            fingerCount * 3;
-
-          results.push({
-            root,
-            typeName: chordType,
-            typeLabel: typeDef.label,
-            frets: fullFrets,
-            fingers,
-            barreInfo: barre,
-            startFret: fretted.length > 0 ? minFret : 0,
-            score,
-            inversion,
-            stringSet: ss.label,
-            cagedShape,
-          });
         }
       }
     }
@@ -235,53 +222,36 @@ export function generateTriadInversions(root: string, chordType: string): TriadV
   return unique;
 }
 
-/**
- * Identify CAGED shape based on the fret pattern geometry.
- * Uses the relative fret positions to match known CAGED triad shapes.
- */
-function identifyCAGEDShapeFromPattern(
-  fretValues: number[],
-  usedStrings: number[],
-  rootIdx: number,
-  inversion: string
-): string {
-  // Normalize frets relative to the lowest fretted position
-  const fretted = fretValues.filter(f => f > 0);
-  const base = fretted.length > 0 ? Math.min(...fretted) : 0;
-  const relative = fretValues.map(f => f - base);
-
-  // Get the string set group
+function identifyCAGEDShape(frets: (number | null)[], usedStrings: number[], rootIdx: number): string {
+  // Determine CAGED shape based on string set and root position relative to open shapes
   const minString = Math.min(...usedStrings);
+  const maxString = Math.max(...usedStrings);
   
-  // CAGED shapes are identified by the position of the root note
-  // relative to the shape's "anchor" position on the neck
-  // We use root position on the lowest string of the set as reference
-  const rootOnLowest = (OPEN_STRINGS[usedStrings[0]]) % 12 === rootIdx;
-  const rootOnMiddle = (OPEN_STRINGS[usedStrings[1]]) % 12 === rootIdx;
-  
-  // Map based on string group and shape geometry
-  if (minString === 3) { // Treble strings G B E
-    if (relative[0] === 0 && relative[1] === 0 && relative[2] === 0) return 'E';
-    if (relative[2] - relative[0] >= 2) return 'C';
-    if (relative[0] - relative[2] >= 2) return 'D';
-    if (relative[1] > relative[0] && relative[1] > relative[2]) return 'A';
-    return 'G';
-  } else if (minString === 2) { // D G B
-    if (relative[0] === 0 && relative[1] === 0 && relative[2] === 0) return 'G';
-    if (relative[0] > relative[1]) return 'E';
-    if (relative[2] > relative[1]) return 'C';
-    if (relative[1] > relative[0]) return 'A';
-    return 'D';
-  } else if (minString === 1) { // A D G
-    if (relative[0] === 0 && relative[1] === 0 && relative[2] === 0) return 'C';
-    if (relative[2] > relative[0]) return 'A';
-    if (relative[0] > relative[2]) return 'G';
+  // Find the root note position
+  let rootFret = -1;
+  for (const s of usedStrings) {
+    if (frets[s] !== null) {
+      const pitch = (OPEN_STRINGS[s] + frets[s]!) % 12;
+      if (pitch === rootIdx) {
+        rootFret = frets[s]!;
+        break;
+      }
+    }
+  }
+
+  // Simple heuristic based on string set and general shape
+  if (maxString === 5 && minString >= 3) {
+    // Treble strings - likely E or C shape
+    return rootFret <= 3 ? 'C' : 'E';
+  } else if (maxString === 4 && minString >= 2) {
+    // Middle-high - likely A or D shape
+    return rootFret <= 3 ? 'D' : 'A';
+  } else if (maxString === 3 && minString >= 1) {
+    // Middle - G or A shape
+    return rootFret <= 3 ? 'G' : 'A';
+  } else {
+    // Bass strings - E shape
     return 'E';
-  } else { // E A D
-    if (relative[0] === 0 && relative[1] === 0 && relative[2] === 0) return 'E';
-    if (relative[2] > relative[1]) return 'A';
-    if (relative[1] > relative[0]) return 'G';
-    return 'D';
   }
 }
 
