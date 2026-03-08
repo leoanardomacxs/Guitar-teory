@@ -195,6 +195,12 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
             </div>
           )}
         </div>
+
+        {/* Chord formula toggle */}
+        {chordFormula.notes.length > 0 && (
+          <button
+            onClick={() => setShowNotes(!showNotes)}
+            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg border transition-all cursor-pointer ${
               showNotes
                 ? 'border-primary bg-primary/10 ring-1 ring-primary/30'
                 : 'border-border bg-card hover:bg-secondary/60'
