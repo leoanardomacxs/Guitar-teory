@@ -207,28 +207,42 @@ const Index: React.FC = () => {
     );
   };
 
-  const renderHarmonicFieldView = () => (
-    <div className="space-y-6">
-      <ViewHeader title={`Campo Harmônico de ${root}`} subtitle="Todos os graus com diagramas individuais" />
-      {harmonicField.map(ch => {
-        const notes = filterByScale(allFretNotes, ch.root, ch.quality === 'Major' ? 'Maior' : ch.quality === 'minor' ? 'Menor Natural' : 'Lócrio');
-        return (
-          <div key={ch.name} className="overflow-x-auto pb-2">
-            <GuitarFretboard
-              notes={notes}
-              maxFret={currentMaxFret}
-              showNoteNames={true}
-              showDegrees={true}
-              colorMode={colorMode}
-              noteRadius={noteSize * 0.9}
-              title={`${ch.romanNumeral} — ${ch.name} (${ch.quality})`}
-              subtitle={`Notas: ${getScale(ch.root, ch.quality === 'Major' ? 'Maior' : ch.quality === 'minor' ? 'Menor Natural' : 'Lócrio').join(' – ')}`}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
+  const renderHarmonicFieldView = () => {
+    const isPentatonic = scaleType === 'Pentatônica Maior' || scaleType === 'Pentatônica Menor';
+    
+    return (
+      <div className="space-y-6">
+        <ViewHeader 
+          title={isPentatonic ? `Pentatônicas do Campo Harmônico de ${root}` : `Campo Harmônico de ${root}`} 
+          subtitle={isPentatonic ? "Pentatônicas de cada grau da tonalidade" : "Todos os graus com diagramas individuais"} 
+        />
+        {harmonicField.map(ch => {
+          let scType: string;
+          if (isPentatonic) {
+            scType = (ch.quality === 'minor' || ch.quality === 'diminished') ? 'Pentatônica Menor' : 'Pentatônica Maior';
+          } else {
+            scType = ch.quality === 'Major' ? 'Maior' : ch.quality === 'minor' ? 'Menor Natural' : 'Lócrio';
+          }
+          const notes = filterByScale(allFretNotes, ch.root, scType);
+          const scaleLabel = isPentatonic ? scType : (ch.quality === 'Major' ? 'Maior' : ch.quality === 'minor' ? 'Menor Natural' : 'Lócrio');
+          return (
+            <div key={ch.name} className="overflow-x-auto pb-2">
+              <GuitarFretboard
+                notes={notes}
+                maxFret={currentMaxFret}
+                showNoteNames={true}
+                showDegrees={true}
+                colorMode={colorMode}
+                noteRadius={noteSize * 0.9}
+                title={`${ch.romanNumeral} — ${ch.root} ${scaleLabel}`}
+                subtitle={`Notas: ${getScale(ch.root, scType).join(' – ')}`}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   const renderHarmonicMatrixView = () => (
     <div className="space-y-4">
