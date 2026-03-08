@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import ChordDiagram from './ChordDiagram';
 import { generateChordVoicings, generateTriadInversions, getChordTypeCategories, CHORD_TYPES } from '@/lib/chordGenerator';
-import type { TriadVoicing } from '@/lib/chordGenerator';
+import type { TriadVoicing, ChordVoicing } from '@/lib/chordGenerator';
 import { ALL_ROOTS, NOTES } from '@/lib/musicTheory';
 import { ChevronDown } from 'lucide-react';
 
