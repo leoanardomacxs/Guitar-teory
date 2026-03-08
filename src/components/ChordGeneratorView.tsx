@@ -2,8 +2,14 @@ import React, { useState, useMemo, useRef, useEffect } from 'react';
 import ChordDiagram from './ChordDiagram';
 import { generateChordVoicings, generateTriadInversions, getChordTypeCategories, CHORD_TYPES } from '@/lib/chordGenerator';
 import type { TriadVoicing } from '@/lib/chordGenerator';
-import { ALL_ROOTS } from '@/lib/musicTheory';
+import { ALL_ROOTS, NOTES } from '@/lib/musicTheory';
 import { ChevronDown } from 'lucide-react';
+
+const INTERVAL_NAMES: Record<number, string> = {
+  0: 'Tônica', 2: '2ª maior', 3: '3ª menor', 4: '3ª maior',
+  5: '4ª justa', 6: '5ª dim', 7: '5ª justa', 8: '5ª aum',
+  9: '6ª maior', 10: '7ª menor', 11: '7ª maior', 14: '9ª maior',
+};
 
 interface ChordGeneratorViewProps {
   root: string;
