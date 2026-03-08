@@ -191,7 +191,7 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
                       : 'text-foreground hover:bg-secondary'
                   }`}
                 >
-                  🎵 Mostrar todos
+                  Mostrar todos
                 </button>
               </div>
             </div>

@@ -43,17 +43,17 @@ interface ControlPanelProps {
 }
 
 const VIEW_MODES: { value: ViewMode; label: string; icon: string }[] = [
-  { value: 'full', label: 'Escala Completa', icon: '🎸' },
-  { value: 'intervals', label: 'Intervalos', icon: '📏' },
-  { value: 'notes', label: 'Notas', icon: '🎵' },
-  { value: 'degrees', label: 'Graus', icon: '🔢' },
-  { value: 'notes-degrees', label: 'Notas + Graus', icon: '📋' },
-  { value: 'tensions', label: 'Tensões', icon: '⚡' },
-  { value: 'chord', label: 'Acorde', icon: '🎶' },
-  { value: 'harmonic-field', label: 'Campo Harmônico', icon: '🏗️' },
-  { value: 'harmonic-matrix', label: 'Matriz Harmônica', icon: '📊' },
-  { value: 'compare-pentatonics', label: 'Comparar Pentatônicas', icon: '🔄' },
-  { value: 'improvisation', label: 'Improvisação', icon: '🎤' },
+  { value: 'full', label: 'Escala Completa', icon: '' },
+  { value: 'intervals', label: 'Intervalos', icon: '' },
+  { value: 'notes', label: 'Notas', icon: '' },
+  { value: 'degrees', label: 'Graus', icon: '' },
+  { value: 'notes-degrees', label: 'Notas + Graus', icon: '' },
+  { value: 'tensions', label: 'Tensões', icon: '' },
+  { value: 'chord', label: 'Acorde', icon: '' },
+  { value: 'harmonic-field', label: 'Campo Harmônico', icon: '' },
+  { value: 'harmonic-matrix', label: 'Matriz Harmônica', icon: '' },
+  { value: 'compare-pentatonics', label: 'Comparar Pentatônicas', icon: '' },
+  { value: 'improvisation', label: 'Improvisação', icon: '' },
 ];
 
 const ControlPanel: React.FC<ControlPanelProps> = ({
@@ -73,7 +73,7 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
     <aside className="w-72 shrink-0 h-screen overflow-y-auto bg-card border-r border-border p-4 space-y-5 scrollbar-thin">
       {/* Header */}
       <div className="flex items-center gap-2 pb-3 border-b border-border">
-        <span className="text-2xl">🎸</span>
+        <span className="text-2xl font-bold">GT</span>
         <div>
           <h1 className="text-base font-bold text-foreground leading-tight">Guitar Theory</h1>
           <p className="text-xs text-muted-foreground">Estudo Visual Interativo</p>
@@ -114,7 +114,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             : 'bg-secondary text-foreground hover:bg-secondary/80'
         }`}
       >
-        <span>🎹</span>
         Gerador de Acordes
       </button>
 
@@ -127,7 +126,6 @@ const ControlPanel: React.FC<ControlPanelProps> = ({
             : 'bg-secondary text-foreground hover:bg-secondary/80'
         }`}
       >
-        <span>🔄</span>
         Progressões
       </button>
 
@@ -280,7 +278,7 @@ function AudioSettingsPanel() {
                 : 'bg-primary/10 text-primary'
             }`}
           >
-            {audio.muted ? '🔇 Mudo' : '🔊 On'}
+            {audio.muted ? 'Mudo' : 'On'}
           </button>
         </div>
         <input

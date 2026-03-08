@@ -59,14 +59,14 @@ export function subscribeAudioSettings(fn: (s: AudioSettings) => void): () => vo
 
 // ─── Timbre Definitions ───
 export const TIMBRE_LIST: { key: TimbreType; label: string; icon: string }[] = [
-  { key: 'guitar', label: 'Violão', icon: '🎸' },
-  { key: 'nylon', label: 'Nylon', icon: '🎵' },
-  { key: 'bass', label: 'Baixo', icon: '🎸' },
-  { key: 'piano', label: 'Piano', icon: '🎹' },
-  { key: 'electric', label: 'Guitarra Elétrica', icon: '⚡' },
-  { key: 'synth', label: 'Sintetizador', icon: '🎛️' },
-  { key: 'organ', label: 'Órgão', icon: '🎶' },
-  { key: 'bell', label: 'Sino / Bell', icon: '🔔' },
+  { key: 'guitar', label: 'Violão', icon: '' },
+  { key: 'nylon', label: 'Nylon', icon: '' },
+  { key: 'bass', label: 'Baixo', icon: '' },
+  { key: 'piano', label: 'Piano', icon: '' },
+  { key: 'electric', label: 'Guitarra Elétrica', icon: '' },
+  { key: 'synth', label: 'Sintetizador', icon: '' },
+  { key: 'organ', label: 'Órgão', icon: '' },
+  { key: 'bell', label: 'Sino / Bell', icon: '' },
 ];
 
 interface TimbreDef {
