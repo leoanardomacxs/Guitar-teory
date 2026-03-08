@@ -46,10 +46,18 @@ const ChordGeneratorView: React.FC<ChordGeneratorViewProps> = ({ root, setRoot }
     return () => document.removeEventListener('mousedown', handler);
   }, []);
 
-  const voicings = useMemo(
-    () => generateChordVoicings(root, selectedType, 20),
-    [root, selectedType]
-  );
+  const voicings = useMemo(() => {
+    if (selectedType === 'all') {
+      const allVoicings: (ChordVoicing & { displayType?: string })[] = [];
+      for (const [key, def] of Object.entries(CHORD_TYPES)) {
+        const v = generateChordVoicings(root, key, 3);
+        v.forEach(voicing => allVoicings.push({ ...voicing, typeLabel: def.label || key }));
+      }
+      allVoicings.sort((a, b) => a.score - b.score);
+      return allVoicings;
+    }
+    return generateChordVoicings(root, selectedType, 20);
+  }, [root, selectedType]);
 
   const triadInversions = useMemo(
     () => generateTriadInversions(root, selectedType),
