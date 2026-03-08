@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from 'react';
-import { getHarmonicField, ALL_ROOTS, type ChordInfo, DEGREE_LABELS, getScale, getNoteIndex, getNoteName, useFlats } from '@/lib/musicTheory';
+import { getHarmonicField, getHarmonicFieldForScale, ALL_ROOTS, type ChordInfo, DEGREE_LABELS, getScale, getNoteIndex, getNoteName, useFlats } from '@/lib/musicTheory';
 import { generateChordVoicings } from '@/lib/chordGenerator';
 import ChordDiagram from './ChordDiagram';
 import { playChordFromFrets, playClick, noteNameToMidi, playChord } from '@/lib/audioEngine';
@@ -55,14 +55,21 @@ function generateRandomProgression(harmonicField: ChordInfo[], length = 4): { de
   return { degrees, chords };
 }
 
+const FIELD_TYPES = [
+  { value: 'Maior', label: 'Maior' },
+  { value: 'Menor Natural', label: 'Menor' },
+  { value: 'Menor Harmônica', label: 'Menor Harmônica' },
+  { value: 'Menor Melódica', label: 'Menor Melódica' },
+] as const;
+
 const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ root, setRoot }) => {
-  const harmonicField = useMemo(() => getHarmonicField(root), [root]);
+  const [fieldType, setFieldType] = useState('Maior');
+  const harmonicField = useMemo(() => getHarmonicFieldForScale(root, fieldType), [root, fieldType]);
   const [currentProgression, setCurrentProgression] = useState<{ degrees: number[]; chords: ChordInfo[] } | null>(null);
   const [progressionLength, setProgressionLength] = useState(4);
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeChordIdx, setActiveChordIdx] = useState<number | null>(null);
   const [history, setHistory] = useState<Array<{ degrees: number[]; chords: ChordInfo[] }>>([]);
-  // all12 mode: generate in random key
   const [displayMode, setDisplayMode] = useState<'full' | 'degrees' | 'hidden'>('full');
   const [showHarmonicField, setShowHarmonicField] = useState(true);
   const [allKeys, setAllKeys] = useState(false);
@@ -73,13 +80,13 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
       targetRoot = ALL_ROOTS[Math.floor(Math.random() * ALL_ROOTS.length)];
       setRoot(targetRoot);
     }
-    const field = allKeys ? getHarmonicField(targetRoot) : harmonicField;
+    const field = allKeys ? getHarmonicFieldForScale(targetRoot, fieldType) : harmonicField;
     const prog = generateRandomProgression(field, progressionLength);
     setCurrentProgression(prog);
     setHistory(prev => [prog, ...prev].slice(0, 10));
     setActiveChordIdx(null);
     playClick(600);
-  }, [harmonicField, progressionLength, allKeys, root, setRoot]);
+  }, [harmonicField, progressionLength, allKeys, root, setRoot, fieldType]);
 
   const selectPreset = useCallback((degrees: number[]) => {
     const chords = degrees.map(d => harmonicField[d - 1]);
@@ -145,14 +152,31 @@ const ProgressionGeneratorView: React.FC<ProgressionGeneratorViewProps> = ({ roo
       <div>
         <h2 className="text-xl font-bold text-foreground">Gerador de Progressões</h2>
         <p className="text-sm text-muted-foreground mt-0.5">
-          Gere progressões harmônicas baseadas no campo de <span className="font-semibold text-foreground">{root} Maior</span>
+          Gere progressões harmônicas baseadas no campo de <span className="font-semibold text-foreground">{root} {fieldType}</span>
         </p>
+      </div>
+
+      {/* Field type selector */}
+      <div className="flex flex-wrap gap-1.5">
+        {FIELD_TYPES.map(ft => (
+          <button
+            key={ft.value}
+            onClick={() => { setFieldType(ft.value); setCurrentProgression(null); playClick(550); }}
+            className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+              fieldType === ft.value
+                ? 'bg-primary text-primary-foreground shadow-sm'
+                : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
+            }`}
+          >
+            {ft.label}
+          </button>
+        ))}
       </div>
 
       {/* Harmonic field overview */}
       <div className="bg-card border border-border rounded-lg p-4">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Campo Harmônico de {root}</p>
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-bold">Campo Harmônico de {root} {fieldType}</p>
           <button
             onClick={() => setShowHarmonicField(!showHarmonicField)}
             className="text-[10px] font-semibold px-2 py-0.5 rounded transition-all bg-secondary text-muted-foreground hover:text-foreground"
